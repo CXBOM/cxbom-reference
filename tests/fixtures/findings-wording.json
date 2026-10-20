@@ -1,0 +1,156 @@
+{
+  "binding": {
+    "description": "The component is recorded unverified because no live proxy session proves its signed pin.",
+    "remediation": {
+      "immediate": [
+        "Route the server through cxbom proxy with a signed lock"
+      ],
+      "shortTerm": [
+        "Pass the proxySessionId from the listing into the assembly"
+      ],
+      "strategic": [
+        "Fail the pipeline gate on unverified tool definitions"
+      ]
+    }
+  },
+  "blocked": {
+    "description": "The proxy blocked tool fetch/fetch (verdict changed) and it never reached the context.",
+    "remediation": {
+      "immediate": [
+        "None required. The proxy removed the definition before the model saw it"
+      ],
+      "shortTerm": [
+        "Review the change with cxbom approve if it is expected"
+      ],
+      "strategic": [
+        "Keep the server in enforce mode"
+      ]
+    }
+  },
+  "change": {
+    "description": "The proxy saw a definition whose hash differs from the signed pin, and it was assembled.",
+    "remediation": {
+      "immediate": [
+        "Stop the session and review the changed definition"
+      ],
+      "shortTerm": [
+        "Run the proxy in enforce mode so changed definitions are blocked"
+      ],
+      "strategic": [
+        "Re-approve only after reviewing the new definition text"
+      ]
+    }
+  },
+  "missing-credentials": {
+    "description": "No scanner supplied containsCredentials, containsSecretsOrKeys. The record marks them notCollected.",
+    "remediation": {
+      "immediate": [
+        "Attach a scanner callback to the assembly"
+      ],
+      "shortTerm": [
+        "Record scanner name, version and time for every component"
+      ],
+      "strategic": [
+        "Gate on missing-control findings with --fail-on any-strict"
+      ]
+    }
+  },
+  "missing-injection": {
+    "description": "No scanner supplied injectionRiskRating, sanitization.scanner, sanitization.scannerVersion, sanitization.scannedAt. The record marks them notCollected.",
+    "remediation": {
+      "immediate": [
+        "Attach a scanner callback to the assembly"
+      ],
+      "shortTerm": [
+        "Record scanner name, version and time for every component"
+      ],
+      "strategic": [
+        "Gate on missing-control findings with --fail-on any-strict"
+      ]
+    }
+  },
+  "missing-pii": {
+    "description": "No scanner supplied containsPII. The record marks them notCollected.",
+    "remediation": {
+      "immediate": [
+        "Attach a scanner callback to the assembly"
+      ],
+      "shortTerm": [
+        "Record scanner name, version and time for every component"
+      ],
+      "strategic": [
+        "Gate on missing-control findings with --fail-on any-strict"
+      ]
+    }
+  },
+  "role-marker": {
+    "description": "Component text contains tokenizer control tokens that the model reads as structure.",
+    "remediation": {
+      "immediate": [
+        "Remove or escape the control tokens before assembly"
+      ],
+      "shortTerm": [
+        "Reject content carrying chat markers at ingestion"
+      ],
+      "strategic": [
+        "Tokenize untrusted content with special-token splitting disabled"
+      ]
+    }
+  },
+  "special": {
+    "description": "Component text contains tokenizer control tokens that the model reads as structure.",
+    "remediation": {
+      "immediate": [
+        "Remove or escape the control tokens before assembly"
+      ],
+      "shortTerm": [
+        "Reject content carrying chat markers at ingestion"
+      ],
+      "strategic": [
+        "Tokenize untrusted content with special-token splitting disabled"
+      ]
+    }
+  },
+  "trust-inversion": {
+    "description": "structural",
+    "remediation": {
+      "immediate": [
+        "Apply a registered trust-downgrade label to the external tool definition"
+      ],
+      "shortTerm": [
+        "Keep the server pinned and bound to a live proxy session"
+      ],
+      "strategic": [
+        "Assemble external tool definitions outside the operator's tool-schema block"
+      ]
+    }
+  },
+  "special-spelled": {
+    "description": "Component text spells tokenizer control tokens that the component's ids do not carry. Re-tokenizing the text would turn them into structure.",
+    "remediation": {
+      "immediate": [
+        "Remove or escape the control tokens before assembly"
+      ],
+      "shortTerm": [
+        "Reject content carrying chat markers at ingestion"
+      ],
+      "strategic": [
+        "Tokenize untrusted content with special-token splitting disabled"
+      ]
+    }
+  },
+  "special-mixed": {
+    "description": "Component text contains tokenizer control tokens. The model reads <tool_call> as structure. The text only spells <think>, which the component's ids do not carry. Re-tokenizing the text would turn those into structure.",
+    "remediation": {
+      "immediate": [
+        "Remove or escape the control tokens before assembly"
+      ],
+      "shortTerm": [
+        "Reject content carrying chat markers at ingestion"
+      ],
+      "strategic": [
+        "Tokenize untrusted content with special-token splitting disabled"
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+# cxbom packaging (spec 3, 12). Owner: ATACE Working Group.
+# Build only with scripts/build_wheel.py, which uses hatchling from
+# requirements/build.txt and sets SOURCE_DATE_EPOCH to the last commit that
+# touched the package, so every machine builds the same bytes.
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cxbom"
+dynamic = ["version"]
+description = "MCP pinning proxy and CxBOM emitter"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "ATACE Working Group" }]
+dependencies = [
+    "rfc8785>=0.1.4,<0.2",
+    "jsonschema[format-nongpl]>=4.23,<5",
+    "rfc3339-validator",
+    "cryptography>=42,<51",
+]
+
+[project.optional-dependencies]
+emit = ["tokenizers>=0.20,<0.24"]
+
+[project.urls]
+Homepage = "https://cxbom.org"
+
+[project.scripts]
+cxbom = "cxbom.cli:main"
+
+[tool.hatch.version]
+path = "cxbom/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cxbom"]
+exclude = ["**/__pycache__", "**/*.pyc"]

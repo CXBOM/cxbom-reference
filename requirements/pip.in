@@ -1,0 +1,6 @@
+# pip for the Ubuntu 22.04 install proof (spec 12, 15). Owner: ATACE Working Group.
+# 22.0.2 is the pip that Ubuntu 22.04 ships and the floor the install job proves.
+# install_cxbom.py --pip-lock force-installs it by hash into every venv it creates.
+# Compile from the repository root, then commit both files:
+#   uv pip compile --universal --python-version 3.10 --generate-hashes requirements/pip.in -o requirements/pip.txt
+pip==22.0.2

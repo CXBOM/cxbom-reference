@@ -1,0 +1,13 @@
+{
+  "CWE-1427": "Improper Neutralization of Input Used for LLM Prompting",
+  "CWE-176": "Improper Handling of Unicode Encoding",
+  "CWE-20": "Improper Input Validation",
+  "CWE-250": "Execution with Unnecessary Privileges",
+  "CWE-269": "Improper Privilege Management",
+  "CWE-345": "Insufficient Verification of Data Authenticity",
+  "CWE-349": "Acceptance of Extraneous Untrusted Data With Trusted Data",
+  "CWE-441": "Unintended Proxy or Intermediary ('Confused Deputy')",
+  "CWE-653": "Improper Isolation or Compartmentalization",
+  "CWE-74": "Improper Neutralization of Special Elements in Output Used by a Downstream Component ('Injection')",
+  "CWE-862": "Missing Authorization"
+}

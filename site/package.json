@@ -1,0 +1,20 @@
+{
+  "name": "cxbom-site-tooling",
+  "private": true,
+  "description": "Pinned CI tooling for cxbom.org: the accessibility gate and the deploy CLI. Nothing here ships to the site. Owner: ATACE Working Group.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "a11y": "node a11y/axe_scan.mjs dist",
+    "a11y:selftest": "node a11y/axe_scan.mjs --self-test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "playwright": "1.63.0",
+    "wrangler": "4.141.0"
+  },
+  "packageManager": "npm@11.6.2+sha512.ee22b335fcbc95662cdf3ab8a053daf045d9cf9c6df6040d28965abb707512b2c16fa6c5eec049d34c74f78f390cebd14f697919eadb97756564d4f9eccc4954"
+}

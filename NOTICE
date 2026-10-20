@@ -1,0 +1,35 @@
+cxbom
+Owner: ATACE Working Group.
+
+The cxbom code is licensed under the Apache License, Version 2.0 (LICENSE).
+
+This product includes files vendored byte-identically from the ATACE artifact,
+commit 3e7f88f (Apache-2.0): cxbom/detectors.py, cxbom/validator.py,
+cxbom/crosswalk.py (the last two with one declared data-path line each), the
+CxBOM 0.2.0 schema, and the catalogs in cxbom/_data/catalogs/.
+
+cxbom/_data/catalogs/cwe.json records CWE identifiers and names. CWE is
+maintained by The MITRE Corporation and is used under the CWE Terms of Use
+(https://cwe.mitre.org/about/termsofuse.html). CWE is a trademark of The MITRE
+Corporation.
+
+cxbom/_data/catalogs/atlas.json records MITRE ATLAS technique identifiers and
+names from https://github.com/mitre-atlas/atlas-data. MITRE ATLAS is a
+trademark of The MITRE Corporation.
+
+cxbom/_data/catalogs/owasp-*.json record identifiers and titles from the OWASP
+Top 10 for LLM Applications (2025 and 2026) and the OWASP Top 10 for Agentic
+Applications 2026, published by the OWASP GenAI Security Project under
+CC-BY-SA-4.0. Only factual identifier-to-title reference data is recorded.
+Sources and retrieval dates are in cxbom/_data/catalogs/SOURCES.json.
+
+Test fixtures (not shipped in the wheel):
+- tests/fixtures/phi3/: Phi-3.5-mini-instruct tokenizer files, Copyright
+  Microsoft, MIT License, source revision
+  2fe192450127e6a83f7441aef6e3ca586c338b77. No model weights.
+- tests/fixtures/qwen3/: Qwen3-8B tokenizer files and chat template
+  (tokenizer.json stored xz-compressed), Copyright 2024 Alibaba Cloud,
+  Apache License 2.0, source revision
+  b968826d9c46dd6066d109eabc6255188de91218. No model weights.
+- tests/fixtures/atace/: the fetch tool schema from mcp-server-fetch (MIT) and
+  public-domain reference texts, vendored from the ATACE artifact.

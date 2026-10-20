@@ -1,0 +1,12 @@
+{
+  "LLM01": "Prompt Injection",
+  "LLM02": "Sensitive Information Disclosure",
+  "LLM03": "Excessive Agency",
+  "LLM04": "Supply Chain",
+  "LLM05": "Data and Model Poisoning",
+  "LLM06": "Unbounded Consumption",
+  "LLM07": "Misinformation",
+  "LLM08": "Hidden Context Exposure",
+  "LLM09": "Vector and Embedding Weaknesses",
+  "LLM10": "Improper Output Handling"
+}

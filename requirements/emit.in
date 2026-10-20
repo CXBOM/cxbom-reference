@@ -1,0 +1,5 @@
+# cxbom[emit] lock input (spec 3, 12). Owner: ATACE Working Group.
+# tokenizers alone, without huggingface-hub: the emitter loads a pinned local
+# tokenizer.json and never downloads. Install after core.txt. Compile:
+#   uv pip compile --universal --python-version 3.10 --generate-hashes --no-deps requirements/emit.in -o requirements/emit.txt
+tokenizers>=0.20,<0.24

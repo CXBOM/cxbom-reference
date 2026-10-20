@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cxbom.org/contracts/measurement/2.0.0/measurement.schema.json",
+  "title": "CxBOM lab measurement (C1)",
+  "description": "Rule attention share and disclosure per design cell and rung, with an evidence class on every quantity. Owner: ATACE Working Group.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "run", "protectiveSpan", "attentionDefinition", "judge", "sinkBins", "ladder"],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "unit": {"type": "number", "minimum": 0, "maximum": 1},
+    "interval": {"type": "array", "prefixItems": [{"$ref": "#/$defs/unit"}, {"$ref": "#/$defs/unit"}], "minItems": 2, "maxItems": 2},
+    "evidence": {"enum": ["confirmatory", "gatekept", "exploratory"]},
+    "hypothesisIds": {"type": "array", "uniqueItems": true, "items": {"enum": ["H1", "H2", "H3", "H4", "Q-H1", "Q-H2"]}}
+  },
+  "properties": {
+    "contract": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": {
+        "name": {"const": "cxbom-measurement"},
+        "version": {"type": "string", "pattern": "^2\\.[0-9]+\\.[0-9]+$"}
+      }
+    },
+    "run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "startedAt", "harnessCommit", "hardware", "seed", "synthetic",
+                   "preregistrationSha256", "environment", "model"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+        "kind": {"enum": ["pilot", "confirmatory"]},
+        "startedAt": {"type": "string", "format": "date-time"},
+        "harnessCommit": {"$ref": "#/$defs/gitSha"},
+        "hardware": {"type": "string", "pattern": "^[a-z0-9-]+$", "description": "Hardware class, never a hostname."},
+        "seed": {"type": "integer"},
+        "synthetic": {"type": "boolean", "description": "True for hand-made example data. Consumers label it and cxbom.org refuses to publish it."},
+        "preregistrationSha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}], "description": "sha256 of the locked lab/PREREGISTRATION.md bytes. Null only for a pilot."},
+        "environment": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["name", "sha256"],
+            "properties": {
+              "name": {"enum": ["requirements.txt", "model_hashes.json", "stimuli-manifest.json",
+                                "wheel-so-manifest.txt", "container-image", "run-manifest.json"]},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        },
+        "model": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "revision", "dtype", "attnImplementation"],
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "revision": {"$ref": "#/$defs/gitSha"},
+            "dtype": {"enum": ["float32", "bfloat16", "float16"]},
+            "attnImplementation": {"enum": ["eager", "j1_eager"]}
+          }
+        }
+      }
+    },
+    "protectiveSpan": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ring", "description", "tokenCount", "textSha256"],
+      "properties": {
+        "ring": {"const": 0},
+        "description": {"type": "string", "minLength": 1},
+        "tokenCount": {"type": "integer", "minimum": 1},
+        "textSha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "attentionDefinition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["queryPositions", "aggregation", "sinkHandling", "ringMass"],
+      "properties": {
+        "queryPositions": {"const": "final-prompt-token"},
+        "aggregation": {"const": "ratio of means"},
+        "sinkHandling": {"const": "sink positions excluded, remainder renormalized"},
+        "ringMass": {"type": "string", "minLength": 1}
+      }
+    },
+    "judge": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "canarySetSha256", "success"],
+      "properties": {
+        "kind": {"const": "canary-string"},
+        "canarySetSha256": {"$ref": "#/$defs/sha256"},
+        "success": {"type": "string", "minLength": 1}
+      }
+    },
+    "sinkBins": {"type": "array", "uniqueItems": true, "items": {"type": "integer", "minimum": 0}},
+    "ladder": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["cell", "rung", "shots", "contextTokens", "trials", "evidence", "hypothesisIds",
+                     "attackSuccess", "primaryRuleShare", "attentionMass", "attentionMassDetail"],
+        "properties": {
+          "cell": {
+            "type": "object", "additionalProperties": false,
+            "required": ["placement", "content", "defense", "span", "regime"],
+            "properties": {
+              "placement": {"enum": ["TOOL", "DOC", "USER", "USER-escaped", "TOOL-native", "TOOL-plain-list"]},
+              "content": {"enum": ["ATTACK", "BENIGN", "ATTACK-inert"]},
+              "defense": {"enum": ["NA", "NONE", "L1", "L2"]},
+              "span": {"enum": ["MINIMAL", "HARDENED", "SANDWICH", "NORULE"]},
+              "regime": {"enum": ["native", "forced-long", "forced-short"]}
+            }
+          },
+          "rung": {"type": "string", "pattern": "^(0|[1-9][0-9]*|R-ref)$"},
+          "shots": {"type": "integer", "minimum": 0},
+          "contextTokens": {"type": "integer", "minimum": 1},
+          "trials": {"type": "integer", "minimum": 1},
+          "evidence": {"$ref": "#/$defs/evidence"},
+          "hypothesisIds": {"$ref": "#/$defs/hypothesisIds"},
+          "attackSuccess": {
+            "type": "object", "additionalProperties": false,
+            "required": ["successes", "rate", "clusterCi95", "descriptiveWilson95", "evidence", "hypothesisIds"],
+            "properties": {
+              "successes": {"type": "integer", "minimum": 0},
+              "rate": {"$ref": "#/$defs/unit"},
+              "clusterCi95": {"$ref": "#/$defs/interval"},
+              "descriptiveWilson95": {"$ref": "#/$defs/interval"},
+              "evidence": {"$ref": "#/$defs/evidence"},
+              "hypothesisIds": {"$ref": "#/$defs/hypothesisIds"}
+            }
+          },
+          "primaryRuleShare": {
+            "type": "object", "additionalProperties": false,
+            "required": ["value", "valueWithRuleSinks", "clusterCi95", "evidence", "hypothesisIds"],
+            "properties": {
+              "value": {"$ref": "#/$defs/unit"},
+              "valueWithRuleSinks": {"$ref": "#/$defs/unit"},
+              "clusterCi95": {"$ref": "#/$defs/interval"},
+              "evidence": {"$ref": "#/$defs/evidence"},
+              "hypothesisIds": {"$ref": "#/$defs/hypothesisIds"}
+            }
+          },
+          "attentionMass": {
+            "type": "object", "additionalProperties": false,
+            "required": ["sink", "ring0", "ring1", "ring2", "evidence", "hypothesisIds"],
+            "properties": {
+              "sink": {"$ref": "#/$defs/unit"}, "ring0": {"$ref": "#/$defs/unit"},
+              "ring1": {"$ref": "#/$defs/unit"}, "ring2": {"$ref": "#/$defs/unit"},
+              "evidence": {"$ref": "#/$defs/evidence"}, "hypothesisIds": {"$ref": "#/$defs/hypothesisIds"}
+            }
+          },
+          "attentionMassDetail": {
+            "type": "object", "additionalProperties": false,
+            "required": ["sink", "scaffold", "rule", "secret", "flood", "padding", "question",
+                         "toolScaffold", "generationPrompt", "evidence", "hypothesisIds"],
+            "properties": {
+              "sink": {"$ref": "#/$defs/unit"}, "scaffold": {"$ref": "#/$defs/unit"},
+              "rule": {"$ref": "#/$defs/unit"}, "secret": {"$ref": "#/$defs/unit"},
+              "flood": {"$ref": "#/$defs/unit"}, "padding": {"$ref": "#/$defs/unit"},
+              "question": {"$ref": "#/$defs/unit"}, "toolScaffold": {"$ref": "#/$defs/unit"},
+              "generationPrompt": {"$ref": "#/$defs/unit"},
+              "evidence": {"$ref": "#/$defs/evidence"}, "hypothesisIds": {"$ref": "#/$defs/hypothesisIds"}
+            }
+          },
+          "field": {
+            "type": "object", "additionalProperties": false,
+            "required": ["rows", "rowCount", "colCount", "binTokens", "normalization", "values", "evidence", "hypothesisIds"],
+            "properties": {
+              "rows": {"const": "layers"},
+              "rowCount": {"type": "integer", "minimum": 1},
+              "colCount": {"type": "integer", "minimum": 1},
+              "binTokens": {"type": "integer", "minimum": 1},
+              "normalization": {"const": "each row sums to 1 over bins"},
+              "values": {"type": "array", "items": {"type": "array", "items": {"$ref": "#/$defs/unit"}}},
+              "evidence": {"$ref": "#/$defs/evidence"},
+              "hypothesisIds": {"$ref": "#/$defs/hypothesisIds"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

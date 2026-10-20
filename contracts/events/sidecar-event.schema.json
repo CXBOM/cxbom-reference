@@ -1,0 +1,367 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cxbom.org/contracts/events/1.4.0/sidecar-event.schema.json",
+  "title": "cxbom proxy sidecar event (C2 1.4.0)",
+  "description": "One line of a proxy's --events sidecar, before the collector merges it. Owner: ATACE Working Group.",
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}(?!\\n)$"
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "at",
+    "mono",
+    "proxySessionId",
+    "localSeq",
+    "type",
+    "data"
+  ],
+  "properties": {
+    "v": {
+      "const": 1
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z(?!\\n)$"
+    },
+    "mono": {
+      "type": "number",
+      "minimum": 0
+    },
+    "proxySessionId": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "localSeq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type": {
+      "enum": [
+        "mcp_message",
+        "tool_listed",
+        "lock_checked",
+        "tool_swapped",
+        "gate_decision",
+        "launch_refused"
+      ]
+    },
+    "data": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "not": {
+          "properties": {
+            "type": {
+              "const": "launch_refused"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "proxySessionId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "launch_refused"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "proxySessionId": {
+            "type": "null"
+          },
+          "localSeq": {
+            "const": 0
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "serverId",
+              "item",
+              "reason",
+              "exitCode"
+            ],
+            "properties": {
+              "serverId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$"
+              },
+              "item": {
+                "enum": [
+                  "argv",
+                  "binary",
+                  "interpreter",
+                  "files",
+                  "trees",
+                  "env",
+                  "entry",
+                  "policy"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "exitCode": {
+                "const": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "gate_decision"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "serverId",
+              "tool",
+              "decision",
+              "reason"
+            ],
+            "properties": {
+              "serverId": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "decision": {
+                "enum": [
+                  "allow",
+                  "block",
+                  "would-block"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              },
+              "findingId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "lock_checked"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "serverId",
+              "tool",
+              "expectedSha256",
+              "actualSha256",
+              "match"
+            ],
+            "properties": {
+              "serverId": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "expectedSha256": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/sha256"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "actualSha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "match": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "mcp_message"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "method",
+              "rpcId",
+              "summary"
+            ],
+            "properties": {
+              "from": {
+                "enum": [
+                  "agent",
+                  "proxy",
+                  "server"
+                ]
+              },
+              "to": {
+                "enum": [
+                  "agent",
+                  "proxy",
+                  "server"
+                ]
+              },
+              "method": {
+                "type": "string"
+              },
+              "rpcId": {
+                "type": [
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "summary": {
+                "type": "string",
+                "maxLength": 200
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "tool_listed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "serverId",
+              "tool",
+              "sha256",
+              "phase"
+            ],
+            "properties": {
+              "serverId": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "phase": {
+                "enum": [
+                  "initial",
+                  "refresh"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "tool_swapped"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "serverId",
+              "tool",
+              "oldSha256",
+              "newSha256",
+              "descriptionDiff"
+            ],
+            "properties": {
+              "serverId": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "oldSha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "newSha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "descriptionDiff": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

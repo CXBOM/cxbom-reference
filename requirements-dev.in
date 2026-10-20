@@ -1,0 +1,12 @@
+# Dev and test dependencies. Owner: ATACE Working Group.
+# Compile: uv pip compile --universal --python-version 3.10 --generate-hashes -c requirements/core.txt -c requirements/emit.txt -c requirements/build.txt requirements-dev.in -o requirements-dev.txt
+jsonschema[format-nongpl]>=4.23,<5
+rfc3339-validator
+rfc8785==0.1.4
+cryptography>=42,<51
+pytest
+tokenizers>=0.20,<0.24
+hatchling==1.32.4
+packaging
+brotli>=1.1,<2
+markdown-it-py>=4.2,<5

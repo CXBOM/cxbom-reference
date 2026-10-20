@@ -1,0 +1,840 @@
+{
+  "_comment": "Context Bill of Materials (CxBOM) v0.3.0 — Example Session Record",
+  "_ref": "ATACE Working Group, Section 6 draft. Extends CycloneDX 1.6.",
+  "specVersion": "0.3.0",
+  "extends": {
+    "format": "CycloneDX",
+    "version": "1.6",
+    "schema": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+  },
+  "serialNumber": "urn:uuid:a7f3c221-4b8e-4d92-b1f5-8e9d0c3f7a12",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-04-05T14:23:11Z",
+    "generatedBy": {
+      "name": "CxBOM Agent Audit Layer",
+      "version": "0.1.0",
+      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+    },
+    "session": {
+      "id": "sess_8f4a2b9c1e3d",
+      "model": {
+        "family": "claude",
+        "version": "claude-sonnet-4-6",
+        "provider": "Anthropic",
+        "contextWindowMaxTokens": 200000,
+        "architectureType": "transformer-decoder"
+      },
+      "contextWindowTokensUsed": 215,
+      "contextWindowUtilizationPercent": 0.11,
+      "turnCount": 3,
+      "startedAt": "2026-04-05T14:20:00Z",
+      "endedAt": "2026-04-05T14:23:11Z"
+    },
+    "agent": {
+      "id": "agent_prod_finance_assistant",
+      "name": "Finance Assistant Agent",
+      "version": "2.1.4",
+      "operator": "Acme Corp Security Team",
+      "deploymentEnvironment": "production",
+      "deploymentId": "deploy_acme_finance_prod_v2"
+    }
+  },
+  "trustModel": {
+    "description": "Three-ring trust tier model. Ring authority is a pre-inference classification only. No trust tier receives different treatment inside the model.",
+    "rings": [
+      {
+        "ring": 0,
+        "designation": "operator",
+        "description": "Operator-authored content. Highest intended authority. Must originate from operator-controlled infrastructure and carry cryptographic integrity verification.",
+        "controlLayer": "system-prompt",
+        "integrityRequirement": "cryptographic",
+        "allowedSources": [
+          "operator-vault",
+          "internal-config-service"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 1,
+        "designation": "agent",
+        "description": "Agent-mediated content. Intermediate authority. Includes tool results, retrieved documents, orchestration metadata, memory injections, and tool definitions from approved sources.",
+        "controlLayer": "tool-execution",
+        "integrityRequirement": "hash-verified",
+        "allowedSources": [
+          "approved-tool-servers",
+          "internal-rag",
+          "approved-mcp-servers"
+        ],
+        "externalSourcesPermitted": true,
+        "externalSourceRequirements": [
+          "operator-permit-listed",
+          "version-pinned",
+          "checksum-verified",
+          "capability-permit-listed"
+        ]
+      },
+      {
+        "ring": 2,
+        "designation": "user",
+        "description": "User-supplied conversational input. Lowest intended authority. Subject to full ingress sanitization pipeline.",
+        "controlLayer": "ingress",
+        "integrityRequirement": "sanitized",
+        "allowedSources": [
+          "authenticated-user-session"
+        ],
+        "externalSourcesPermitted": false
+      }
+    ]
+  },
+  "contextComponents": [
+    {
+      "id": "cc-001",
+      "type": "system-prompt",
+      "subtype": "primary-operator-instruction",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "system-prompt",
+      "label": "Primary operator system prompt",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-vault",
+        "uri": "vault://acme-ai/prompts/finance-assistant/v2.1.4",
+        "retrievedAt": "2026-04-05T14:20:00Z",
+        "authorizedBy": "operator-config-service",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "452d0c5ae0b9d9b9f38c7999c34ff767251ebe08a9a481ae8c01d329345e492d",
+        "tokenCount": 48,
+        "contextualSharePercent": 22.33,
+        "positionInContext": "prepended",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "control-character-strip",
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-financial-data",
+          "generate-reports",
+          "query-erp"
+        ],
+        "deniedActions": [
+          "write-transactions",
+          "delete-records",
+          "external-transfer"
+        ],
+        "overrideResistanceDeclared": true,
+        "confidentialityInstructionPresent": true,
+        "negativeCapabilityListPresent": true
+      },
+      "caching": {
+        "cached": true,
+        "cacheBreakpoint": "ring-0-invariant",
+        "cacheTtlSeconds": 300
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-002",
+      "type": "tool-definition",
+      "subtype": "internal-operator-authored",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "tool-execution",
+      "label": "Internal ERP query tool — operator-authored definition",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-config-service",
+        "uri": "config://acme-ai/tools/erp-query/v1.2.0",
+        "retrievedAt": "2026-04-05T14:20:01Z",
+        "authorizedBy": "operator-config-service",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "f98aacd272f65e6a07236d60e00886529d09d03ef672809eeb7447b17728e792",
+        "tokenCount": 31,
+        "contextualSharePercent": 14.42,
+        "positionInContext": "tool-schema-block",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "schema-validation",
+          "capability-permitlist-check",
+          "unicode-normalization"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "erp-read"
+        ],
+        "deniedActions": [
+          "erp-write",
+          "erp-delete",
+          "erp-admin"
+        ],
+        "capabilityScope": "read-only",
+        "capabilityPermitListVerified": true
+      },
+      "toolDefinitionTrustInversion": {
+        "detected": false,
+        "reason": "Operator-controlled source. Ring 0 provenance. Integrity hash verified."
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-003",
+      "type": "tool-definition",
+      "subtype": "external-mcp-server",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "External MCP tool definition — market data provider",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "external-mcp-server",
+        "uri": "mcp://marketdata.external-provider.com/v2/tools",
+        "retrievedAt": "2026-04-05T14:20:03Z",
+        "authorizedBy": null,
+        "thirdParty": true,
+        "operatorControlled": false,
+        "serverOperator": "External Provider Inc.",
+        "serverVersion": "2.0.1",
+        "serverVersionPinned": false,
+        "serverChecksumVerified": false,
+        "serverLastSecurityAudit": null,
+        "serverOperatorIdentityVerified": false
+      },
+      "content": {
+        "sha256": "96f6501bca198965cc7ca5adc303ce3578f45d24d5df4c6d91010d74bcdb1665",
+        "tokenCount": 29,
+        "contextualSharePercent": 13.49,
+        "positionInContext": "tool-schema-block",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "scanned-with-warnings",
+        "appliedControls": [
+          "unicode-normalization",
+          "injection-pattern-scan"
+        ],
+        "missingControls": [
+          "server-integrity-verification",
+          "capability-permitlist-check",
+          "trust-tier-downgrade-label"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "market-data-read"
+        ],
+        "deniedActions": [],
+        "capabilityScope": "unverified",
+        "capabilityPermitListVerified": false,
+        "overrideResistanceDeclared": false
+      },
+      "toolDefinitionTrustInversion": {
+        "detected": true,
+        "severity": "high",
+        "description": "Tool definition sourced from an external MCP server (Ring 1, third-party provenance) is assembled into the operator's tool-schema block without a trust-tier downgrade label. The record locates the definition by assembly position and trust ring. No currently active control in the tool-execution layer addresses this trust mismatch at assembly time.",
+        "formalRef": "ATACE Section 1.5, Finding 1: Tool Definition Trust Inversion",
+        "positionalAuthority": "ring-0-equivalent",
+        "claimedAuthority": "ring-1",
+        "authorityMismatch": true,
+        "mitigationStatus": "partial",
+        "mitigationApplied": [
+          "injection-scan"
+        ],
+        "mitigationRequired": [
+          "server-integrity-verification",
+          "capability-permitlist-enforcement",
+          "trust-tier-downgrade-label",
+          "operator-permit-list-entry"
+        ]
+      },
+      "auditFlags": [
+        "TRUST_INVERSION_DETECTED",
+        "THIRD_PARTY_MCP_UNVERIFIED",
+        "SERVER_CHECKSUM_NOT_VERIFIED",
+        "SERVER_VERSION_NOT_PINNED",
+        "CAPABILITY_SCOPE_UNVERIFIED",
+        "MISSING_TRUST_TIER_LABEL"
+      ],
+      "injectionRiskRating": "high",
+      "findingRefs": [
+        "finding-001"
+      ]
+    },
+    {
+      "id": "cc-004",
+      "type": "user-turn",
+      "subtype": "conversational-query",
+      "trustRing": 2,
+      "trustTier": "user",
+      "controlLayer": "ingress",
+      "label": "User query — turn 1",
+      "assembledAtTurn": 1,
+      "source": {
+        "origin": "authenticated-user-session",
+        "userIdHash": "sha256:9a4f2cbb1b8c28a246634d7bfa9efb77",
+        "sessionId": "sess_8f4a2b9c1e3d",
+        "ipHash": "sha256:a3f1d82c9e0b4517",
+        "authenticatedAt": "2026-04-05T14:19:58Z",
+        "authMethod": "oauth2-pkce",
+        "thirdParty": false
+      },
+      "content": {
+        "sha256": "b090c773ba60841902afb017c1dee889bb03bb8652a5c9013422b9b578c8ffa0",
+        "tokenCount": 17,
+        "contextualSharePercent": 7.91,
+        "positionInContext": "user-turn-1",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip-plus-homoglyph-detect"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "homoglyph-detection",
+          "injection-pattern-scan",
+          "token-length-enforcement",
+          "rate-limit-check"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "query-agent"
+        ],
+        "deniedActions": [
+          "modify-system-prompt",
+          "invoke-tools-directly",
+          "override-ring-0"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-005",
+      "type": "tool-result",
+      "subtype": "internal-erp-query",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "ERP query result — accounts receivable summary",
+      "assembledAtTurn": 2,
+      "source": {
+        "origin": "internal-tool-server",
+        "toolId": "erp-query",
+        "toolVersion": "1.2.0",
+        "invokedAt": "2026-04-05T14:23:10Z",
+        "thirdParty": false,
+        "sandboxed": true,
+        "executionEnvironment": "isolated-container",
+        "runtimeVersion": "v8-22.0"
+      },
+      "content": {
+        "sha256": "80d75018457eccc5fd62301632e0696e8e75f83c44f8ba0b814b361e57aa5131",
+        "tokenCount": 57,
+        "contextualSharePercent": 26.51,
+        "positionInContext": "tool-result-turn-2",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "dataClassification": "confidential-financial",
+        "containsPII": false,
+        "containsCredentials": false,
+        "containsSecretsOrKeys": false
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "pii-detection",
+          "credential-pattern-scan",
+          "structured-output-schema-validation",
+          "trust-label-injection"
+        ],
+        "trustLabel": "<tool_data source=\"erp-query\" trust=\"ring-1\" turn=\"2\">"
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "forward-to-user-unfiltered"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-006",
+      "type": "retrieved-document",
+      "subtype": "rag-chunk",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "RAG retrieval — Q1 2026 financial policy document, chunk 047",
+      "assembledAtTurn": 2,
+      "source": {
+        "origin": "internal-vector-store",
+        "vectorStoreId": "vs_acme_policies",
+        "documentId": "doc_fin_policy_q1_2026",
+        "documentSha256": "934d62d5a2581927e2327353d79808ae2c9cc248537a31d7875f0752bfc2152e",
+        "chunkId": "chunk_047",
+        "retrievedAt": "2026-04-05T14:23:10Z",
+        "thirdParty": false,
+        "tenantNamespaced": true,
+        "tenantId": "acme-corp",
+        "accessControlVerified": true
+      },
+      "content": {
+        "sha256": "934d62d5a2581927e2327353d79808ae2c9cc248537a31d7875f0752bfc2152e",
+        "tokenCount": 33,
+        "contextualSharePercent": 15.35,
+        "positionInContext": "retrieved-content-turn-2",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "embeddingModel": "text-embedding-3-large",
+        "embeddingModelVersion": "2024-12",
+        "similarityScore": 0.912,
+        "retrievalQuery": "[query-hash-only: sha256:7f83b...]"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "trust-label-injection",
+          "pii-detection"
+        ],
+        "trustLabel": "<retrieved_doc source=\"internal-vector-store\" doc=\"doc_fin_policy_q1_2026\" chunk=\"047\" trust=\"ring-1\">"
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": [
+        "finding-002"
+      ],
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "forward-to-user-unfiltered"
+        ]
+      }
+    }
+  ],
+  "controlLayers": [
+    {
+      "layerId": "ingress",
+      "designation": "Ingress",
+      "description": "Pre-model authentication, input validation, rate limiting, and content pre-classification.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM03"
+      ],
+      "controlsActive": [
+        "oauth2-pkce-authentication",
+        "token-length-cap",
+        "rate-limiter-per-user",
+        "rate-limiter-per-session",
+        "unicode-normalization",
+        "homoglyph-detector",
+        "injection-pre-classifier"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "system-prompt",
+      "designation": "System Prompt (Ring 0)",
+      "description": "Operator instruction governance, override-resistance declaration, trust boundary labeling.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM09"
+      ],
+      "controlsActive": [
+        "override-resistance-declaration",
+        "trust-boundary-xml-labeling",
+        "negative-capability-list",
+        "confidentiality-instruction",
+        "action-gate-declaration"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "reasoning",
+      "designation": "Agent Reasoning",
+      "description": "In-flight behavioral monitoring, scope enforcement, confidence gating.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM08"
+      ],
+      "controlsActive": [
+        "thought-chain-monitor",
+        "scope-creep-detector",
+        "confidence-gate"
+      ],
+      "controlsInactive": [
+        "human-in-loop-checkpoint"
+      ],
+      "status": "partial",
+      "coverageGaps": [
+        "Human-in-loop checkpoints not configured. Irreversible actions execute without approval gate."
+      ]
+    },
+    {
+      "layerId": "tool-execution",
+      "designation": "Tool Execution",
+      "description": "Real-system action boundary. Least-privilege tool design, server-side validation, supply chain verification.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM05",
+        "LLM06"
+      ],
+      "controlsActive": [
+        "server-side-input-validation",
+        "tool-output-injection-scan",
+        "tool-output-trust-label-injection",
+        "execution-sandboxing",
+        "internal-tool-allowlist",
+        "pii-detection-on-tool-output",
+        "credential-scan-on-tool-output"
+      ],
+      "controlsInactive": [
+        "external-mcp-server-integrity-verification",
+        "external-tool-capability-permitlist",
+        "trust-tier-downgrade-label-for-external-definitions",
+        "mcp-server-version-pinning"
+      ],
+      "status": "partial",
+      "coverageGaps": [
+        "External MCP tool definitions admitted without integrity verification, capability permit-listing, or trust-tier downgrade labeling. See Finding 1: Tool Definition Trust Inversion."
+      ],
+      "findingRefs": [
+        "finding-001"
+      ],
+      "agenticCoverage": [
+        "ASI02",
+        "ASI04"
+      ]
+    },
+    {
+      "layerId": "egress",
+      "designation": "Output / Egress",
+      "description": "Post-inference content control, PII and credential scrubbing, schema enforcement, attribution logging.",
+      "owaspCoverage": [
+        "LLM02",
+        "LLM06",
+        "LLM08"
+      ],
+      "controlsActive": [
+        "pii-scrubber",
+        "credential-scrubber",
+        "output-content-classifier",
+        "schema-validator",
+        "response-attribution-logger"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "infrastructure",
+      "designation": "Infrastructure",
+      "description": "Observability fabric, immutable audit logging, model version pinning, secret management, network segmentation, vector DB access control.",
+      "owaspCoverage": [
+        "LLM03",
+        "LLM05",
+        "LLM07",
+        "LLM10"
+      ],
+      "controlsActive": [
+        "immutable-audit-log-siem-forwarding",
+        "anomaly-detector-token-usage",
+        "anomaly-detector-tool-call-frequency",
+        "model-version-pin-ci",
+        "system-prompt-vcs-signed-commits",
+        "network-egress-allowlist",
+        "vault-secret-management",
+        "secret-rotation-scheduled",
+        "vector-db-tenant-namespace",
+        "vector-db-auth-per-query",
+        "token-budget-enforcement-gateway"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-001",
+      "title": "Tool Definition Trust Inversion — External MCP Server",
+      "severity": "high",
+      "category": "trust-inversion",
+      "cweRef": "CWE-345",
+      "owaspRefs": [
+        "LLM01",
+        "LLM04",
+        "LLM05"
+      ],
+      "formalRef": "",
+      "affectedComponents": [
+        "cc-003"
+      ],
+      "affectedLayers": [
+        "tool-execution"
+      ],
+      "description": "External MCP server tool definition (cc-003) is assembled into the context window with Ring 0-equivalent positional authority while carrying Ring 1 (third-party) provenance. The record locates the definition by assembly position and trust ring. No currently active control in the tool-execution layer addresses this trust mismatch at context assembly time.",
+      "evidence": {
+        "componentId": "cc-003",
+        "sourceUri": "mcp://marketdata.external-provider.com/v2/tools",
+        "serverOperator": "External Provider Inc.",
+        "serverChecksumVerified": false,
+        "serverVersionPinned": false,
+        "lastSecurityAudit": null,
+        "missingControls": [
+          "server-integrity-verification",
+          "capability-permitlist-check",
+          "trust-tier-downgrade-label"
+        ],
+        "activeAuditFlags": [
+          "TRUST_INVERSION_DETECTED",
+          "THIRD_PARTY_MCP_UNVERIFIED",
+          "SERVER_CHECKSUM_NOT_VERIFIED",
+          "SERVER_VERSION_NOT_PINNED",
+          "CAPABILITY_SCOPE_UNVERIFIED",
+          "MISSING_TRUST_TIER_LABEL"
+        ]
+      },
+      "remediation": {
+        "immediate": [
+          "Apply trust-tier-downgrade label (<tool_definition source=\"external-mcp\" trust=\"ring-1\">) to cc-003 before context assembly",
+          "Block invocation of any capability declared by cc-003 not on operator permit-list",
+          "Verify MCP server operator identity and checksum before next session"
+        ],
+        "shortTerm": [
+          "Pin external MCP server version in deployment configuration",
+          "Add External Provider Inc. to operator permit-list with explicit capability scope",
+          "Enable mcp-server-integrity-verification control in tool-execution layer"
+        ],
+        "strategic": [
+          "Enforce Ring 1 classification for all external MCP tool definitions as mandatory control",
+          "Require signed security audit of MCP server operators before production approval",
+          "Implement CxBOM trust-inversion detection in CI/CD pipeline for all agent deployments",
+          "Contribute Tool Definition Trust Inversion as a formal sub-category to OWASP LLM Top 10 (LLM03 / LLM06)"
+        ]
+      },
+      "status": "open",
+      "detectedAt": "2026-04-05T14:20:03Z",
+      "slaDeadline": "2026-04-12T00:00:00Z",
+      "agenticRefs": [
+        "ASI02",
+        "ASI04"
+      ]
+    },
+    {
+      "id": "finding-002",
+      "title": "Indirect prompt injection through retrieved content",
+      "severity": "medium",
+      "category": "injection",
+      "cweRef": "CWE-1427",
+      "owaspRefs": [
+        "LLM01"
+      ],
+      "formalRef": "",
+      "affectedComponents": [
+        "cc-006"
+      ],
+      "affectedLayers": [
+        "tool-execution"
+      ],
+      "description": "Retrieved document cc-006 is assembled at Ring 1 and carries text the model may read as an instruction. EchoLeak (CVE-2025-32711) is an injection through retrieved content, not a workspace-configuration write. The component records the retrieval source and denies the action 'interpret-as-instruction', but no active control verifies that the retrieved text stays data.",
+      "evidence": {
+        "componentId": "cc-006",
+        "sourceUri": "internal-vector-store:doc_fin_policy_q1_2026#chunk_047",
+        "documentSha256": "934d62d5a2581927e2327353d79808ae2c9cc248537a31d7875f0752bfc2152e",
+        "missingControls": [
+          "retrieved-content-instruction-check"
+        ]
+      },
+      "remediation": {
+        "immediate": [
+          "Treat retrieved text as data and keep the instruction boundary in the prompt"
+        ],
+        "shortTerm": [
+          "Add a retrieved-content injection check before assembly"
+        ],
+        "strategic": [
+          "Record the instruction/data boundary for every retrieved chunk"
+        ]
+      },
+      "status": "open",
+      "detectedAt": "2026-04-05T14:20:03Z"
+    }
+  ],
+  "sessionSummary": {
+    "totalContextTokens": 215,
+    "componentBreakdown": {
+      "byTrustRing": {
+        "ring0": {
+          "tokens": 79,
+          "sharePercent": 36.74,
+          "components": [
+            "cc-001",
+            "cc-002"
+          ]
+        },
+        "ring1": {
+          "tokens": 119,
+          "sharePercent": 55.35,
+          "components": [
+            "cc-003",
+            "cc-005",
+            "cc-006"
+          ]
+        },
+        "ring2": {
+          "tokens": 17,
+          "sharePercent": 7.91,
+          "components": [
+            "cc-004"
+          ]
+        }
+      },
+      "byType": {
+        "systemPrompt": {
+          "tokens": 48,
+          "sharePercent": 22.33
+        },
+        "toolDefinition": {
+          "tokens": 60,
+          "sharePercent": 27.91
+        },
+        "userTurn": {
+          "tokens": 17,
+          "sharePercent": 7.91
+        },
+        "toolResult": {
+          "tokens": 57,
+          "sharePercent": 26.51
+        },
+        "retrievedDocument": {
+          "tokens": 33,
+          "sharePercent": 15.35
+        }
+      }
+    },
+    "findingsSummary": {
+      "critical": 0,
+      "high": 1,
+      "medium": 1,
+      "low": 0,
+      "totalOpen": 2
+    },
+    "controlLayerStatus": {
+      "active": [
+        "ingress",
+        "system-prompt",
+        "egress",
+        "infrastructure"
+      ],
+      "partial": [
+        "reasoning",
+        "tool-execution"
+      ],
+      "inactive": []
+    },
+    "overallRiskRating": "high",
+    "riskRationale": "Two open findings: one high-severity trust inversion and one medium-severity injection through retrieved content.",
+    "auditTrailComplete": true,
+    "sessionAuditClean": false,
+    "auditCleanBlockers": [
+      "finding-001",
+      "finding-002"
+    ],
+    "templateOverheadTokens": 0
+  },
+  "schema": {
+    "cxbomVersion": "0.3.0",
+    "fieldGlossary": {
+      "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
+      "contextualSharePercent": "This component's token count as a percentage of total context tokens used.",
+      "toolDefinitionTrustInversion.detected": "True if a tool definition's source provenance trust ring is lower than its positional authority in the context window. See ATACE Section 1.5 Finding 1.",
+      "auditFlags": "Machine-readable flag set for automated SIEM ingestion. TRUST_INVERSION_DETECTED triggers mandatory remediation workflow.",
+      "sessionSummary.auditCleanBlockers": "List of finding IDs that must be resolved before the session record is marked audit-clean. Analogous to SBOM vulnerability findings that block container deployment."
+    }
+  },
+  "bomFormat": "CxBOM",
+  "illustrative": true,
+  "catalogVersions": {
+    "owaspLlm": {
+      "version": "2026",
+      "url": "https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "a27034a5c2ebc53fe14a7394e984428944e40a5def3a18f64abf1deb4beffa33",
+      "commit": "d027bb64",
+      "ref": "2026-final"
+    },
+    "owaspAgentic": {
+      "version": "2026",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "d5a247ea0646193bc4e58810c9088d414a7d685b66e24f55f9b047a64acee467"
+    },
+    "cwe": {
+      "version": "CWE",
+      "url": "https://cwe.mitre.org/",
+      "released": true,
+      "releaseTag": "CWE (verified 2026-07-11)",
+      "contentHash": "97c45c50ef6602e71c7113bc0cb153d60ab2bfc1bee63e9a352d1dffb8a3fd67"
+    },
+    "atlas": {
+      "version": "ATLAS",
+      "url": "https://github.com/mitre-atlas/atlas-data",
+      "released": true,
+      "releaseTag": "MITRE ATLAS (verified 2026-07-11)",
+      "contentHash": "a9b3f97ca72f01bf5d1748ed20292e9bf5d4d12bea8777db98a0d2075f06e176"
+    },
+    "cyclonedx": {
+      "version": "1.6",
+      "url": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+    }
+  }
+}

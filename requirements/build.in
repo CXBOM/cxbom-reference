@@ -1,0 +1,4 @@
+# Wheel build backend (spec 12). Owner: ATACE Working Group.
+# Compile from the repository root, then commit both files together:
+#   uv pip compile --universal --python-version 3.10 --generate-hashes requirements/build.in -o requirements/build.txt
+hatchling==1.32.4

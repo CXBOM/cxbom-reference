@@ -1,0 +1,1619 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cxbom.org/schema/0.2.0/cxbom.schema.json",
+  "title": "CxBOM 0.2.0 — Context Bill of Materials",
+  "description": "JSON Schema for the Context Bill of Materials (CxBOM) v0.1.0, an extension profile of CycloneDX 1.6 for auditing LLM agent context windows. CxBOM records every component assembled into a session context, its trust provenance, sanitization state, and any findings — enabling pre-inference supply-chain auditing of AI agent sessions.",
+  "$comment": "Design principles: (1) Extends CycloneDX 1.6 per NIST SP 800-218 and AI/ML-BOM extension patterns. (2) Trust encoding is PRE-INFERENCE ONLY — Token Democracy (Young, 2025) means no ring gets computational privilege inside the attention mechanism. (3) Missing controls are explicitly recorded (the 'principle of missing controls') — not just what was applied, but what SHOULD have been applied. (4) Finding structure mirrors CVE records with three-tier remediation (immediate / short-term / strategic). (5) References ATACE Working Group formal results: Lemma 1 (Softmax Crowding), Adversarial Override, and the Dual-Failure Multiplier.",
+  "type": "object",
+  "required": [
+    "bomFormat",
+    "specVersion",
+    "extends",
+    "serialNumber",
+    "version",
+    "metadata",
+    "trustModel",
+    "contextComponents",
+    "controlLayers",
+    "findings",
+    "sessionSummary",
+    "schema",
+    "catalogVersions",
+    "illustrative"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_comment": {
+      "type": "string",
+      "description": "Optional human-readable comment for the CxBOM document."
+    },
+    "_ref": {
+      "type": "string",
+      "description": "Optional reference annotation (e.g., working group section)."
+    },
+    "bomFormat": {
+      "type": "string",
+      "const": "CxBOM",
+      "description": "Identifier for the BOM format. Always 'CxBOM'."
+    },
+    "specVersion": {
+      "type": "string",
+      "const": "0.2.0",
+      "description": "Version of the CxBOM specification this document conforms to."
+    },
+    "extends": {
+      "type": "object",
+      "description": "Declares the parent specification that CxBOM extends. CxBOM is an extension profile of CycloneDX 1.6, following NIST SP 800-218 and AI/ML-BOM extension patterns.",
+      "required": [
+        "format",
+        "version",
+        "schema"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "type": "string",
+          "description": "Parent specification format.",
+          "examples": [
+            "CycloneDX"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Parent specification version.",
+          "examples": [
+            "1.6"
+          ]
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URI of the parent specification's JSON Schema.",
+          "examples": [
+            "https://cyclonedx.org/schema/bom-1.6.schema.json"
+          ]
+        }
+      }
+    },
+    "serialNumber": {
+      "type": "string",
+      "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Unique identifier for this CxBOM document in URN UUID format."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version of this specific CxBOM document instance. Increments when the same session is re-audited."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about the CxBOM generation event, the audited session, and the agent under audit.",
+      "required": [
+        "timestamp",
+        "generatedBy",
+        "session",
+        "agent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this CxBOM was generated."
+        },
+        "generatedBy": {
+          "type": "object",
+          "description": "The tool or service that generated this CxBOM.",
+          "required": [
+            "name",
+            "version",
+            "schema"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the CxBOM generator."
+            },
+            "version": {
+              "type": "string",
+              "description": "Version of the CxBOM generator."
+            },
+            "schema": {
+              "type": "string",
+              "description": "URI of the CxBOM schema this generator targets."
+            }
+          }
+        },
+        "session": {
+          "type": "object",
+          "description": "The LLM session being audited.",
+          "required": [
+            "id",
+            "model",
+            "contextWindowTokensUsed",
+            "contextWindowUtilizationPercent",
+            "turnCount",
+            "startedAt",
+            "endedAt"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique session identifier."
+            },
+            "model": {
+              "type": "object",
+              "description": "The LLM model used in this session.",
+              "required": [
+                "family",
+                "version",
+                "provider",
+                "contextWindowMaxTokens",
+                "architectureType",
+                "attentionMechanism",
+                "tokenDemocracyApplies"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "family": {
+                  "type": "string",
+                  "description": "Model family (e.g., 'claude', 'gpt')."
+                },
+                "version": {
+                  "type": "string",
+                  "description": "Specific model version identifier."
+                },
+                "provider": {
+                  "type": "string",
+                  "description": "Organization providing the model."
+                },
+                "contextWindowMaxTokens": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Maximum token capacity of the model's context window."
+                },
+                "architectureType": {
+                  "type": "string",
+                  "description": "Model architecture type (e.g., 'transformer-decoder')."
+                },
+                "attentionMechanism": {
+                  "type": "string",
+                  "description": "Attention mechanism used (e.g., 'scaled-dot-product')."
+                },
+                "tokenDemocracyApplies": {
+                  "type": "boolean",
+                  "description": "Whether Token Democracy applies: all tokens receive equal computational weight in the attention mechanism regardless of trust ring. Per Young (2025), this is true for all standard transformer architectures.",
+                  "$comment": "Token Democracy (Young, 2025): The SoftMax attention function processes every token with identical computational weight. Trust ring labels are a pre-inference organizational abstraction only — they confer NO computational privilege inside the model."
+                }
+              }
+            },
+            "contextWindowTokensUsed": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total tokens consumed in the context window for this session."
+            },
+            "contextWindowUtilizationPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Percentage of maximum context window capacity used. Feeds into Dual-Failure Multiplier assessment (ATACE)."
+            },
+            "turnCount": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of conversational turns in the session."
+            },
+            "startedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when the session started."
+            },
+            "endedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when the session ended."
+            }
+          }
+        },
+        "agent": {
+          "type": "object",
+          "description": "The AI agent deployment being audited.",
+          "required": [
+            "id",
+            "name",
+            "version",
+            "operator",
+            "deploymentEnvironment",
+            "deploymentId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique agent identifier."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable agent name."
+            },
+            "version": {
+              "type": "string",
+              "description": "Agent software version."
+            },
+            "operator": {
+              "type": "string",
+              "description": "Organization or team operating this agent."
+            },
+            "deploymentEnvironment": {
+              "type": "string",
+              "enum": [
+                "production",
+                "staging",
+                "development",
+                "testing"
+              ],
+              "description": "Deployment environment classification."
+            },
+            "deploymentId": {
+              "type": "string",
+              "description": "Unique deployment identifier for traceability."
+            }
+          }
+        }
+      }
+    },
+    "trustModel": {
+      "type": "object",
+      "description": "Declares the trust model governing context assembly. Trust rings are a PRE-INFERENCE classification only — Token Democracy means no ring receives computational privilege inside the attention mechanism.",
+      "$comment": "The trust model encodes intended authority tiers. These DO NOT translate to computational privilege during inference. See Lemma 1 (Softmax Crowding) and Adversarial Override.",
+      "required": [
+        "description",
+        "rings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the trust model."
+        },
+        "rings": {
+          "type": "array",
+          "description": "Ordered array of trust rings from highest intended authority (0) to lowest (2).",
+          "items": {
+            "$ref": "#/definitions/trustRing"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "contextComponents": {
+      "type": "array",
+      "description": "Every discrete component assembled into the context window. This is the core of the CxBOM — a full inventory of what the model 'sees' at inference time.",
+      "$comment": "Analogous to CycloneDX component inventory but for context window contents rather than software packages.",
+      "items": {
+        "$ref": "#/definitions/contextComponent"
+      }
+    },
+    "controlLayers": {
+      "type": "array",
+      "description": "Defense-in-depth control layers surrounding the agent session. Records both active and inactive controls — the principle of missing controls requires explicit documentation of what SHOULD be active but is not.",
+      "items": {
+        "$ref": "#/definitions/controlLayer"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Security findings identified during the audit. Structure mirrors CVE records with three-tier remediation (immediate / short-term / strategic).",
+      "$comment": "Finding structure follows CVE record patterns. Three-tier remediation maps to operational incident response timelines.",
+      "items": {
+        "$ref": "#/definitions/finding"
+      }
+    },
+    "sessionSummary": {
+      "type": "object",
+      "description": "Aggregate session-level summary including token distribution by trust ring, findings summary, control layer status, and Dual-Failure Multiplier assessment.",
+      "$comment": "The Dual-Failure Multiplier (ATACE) captures the non-linear relationship between context window utilization and combined quality/security degradation.",
+      "required": [
+        "totalContextTokens",
+        "componentBreakdown",
+        "findingsSummary",
+        "controlLayerStatus",
+        "dualFailureMultiplierAssessment",
+        "overallRiskRating",
+        "riskRationale",
+        "auditTrailComplete",
+        "sessionAuditClean",
+        "auditCleanBlockers",
+        "templateOverheadTokens"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "totalContextTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens across all context components."
+        },
+        "componentBreakdown": {
+          "type": "object",
+          "description": "Token distribution breakdown by trust ring and by component type.",
+          "required": [
+            "byTrustRing",
+            "byType"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "byTrustRing": {
+              "type": "object",
+              "description": "Token counts and share percentages grouped by trust ring.",
+              "required": [
+                "ring0",
+                "ring1",
+                "ring2"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "ring0": {
+                  "$ref": "#/definitions/ringBreakdown"
+                },
+                "ring1": {
+                  "$ref": "#/definitions/ringBreakdown"
+                },
+                "ring2": {
+                  "$ref": "#/definitions/ringBreakdown"
+                }
+              }
+            },
+            "byType": {
+              "type": "object",
+              "description": "Token counts and share percentages grouped by component type.",
+              "additionalProperties": {
+                "$ref": "#/definitions/typeBreakdown"
+              }
+            }
+          }
+        },
+        "findingsSummary": {
+          "type": "object",
+          "description": "Aggregate counts of findings by severity.",
+          "required": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "totalOpen"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "critical": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "high": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "totalOpen": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Count of findings with status 'open'."
+            }
+          }
+        },
+        "controlLayerStatus": {
+          "type": "object",
+          "description": "Layer IDs grouped by operational status.",
+          "required": [
+            "active",
+            "partial",
+            "inactive"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "active": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Layer IDs where all declared controls are operational."
+            },
+            "partial": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Layer IDs where some controls are inactive."
+            },
+            "inactive": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Layer IDs where the layer is not operational."
+            }
+          }
+        },
+        "dualFailureMultiplierAssessment": {
+          "type": "object",
+          "description": "Assessment per the ATACE Dual-Failure Multiplier: rising context utilization simultaneously degrades output quality and increases attack surface via SoftMax normalization pressure.",
+          "$comment": "Dual-Failure Multiplier: as context utilization rises, quality degradation and attack-surface expansion compound. Ratings are operator-asserted/illustrative; see the paper's formal results (Softmax Crowding, Adversarial Override, Dual-Failure Multiplier) for the analysis.",
+          "required": [
+            "contextWindowUtilization",
+            "qualityPressureRating",
+            "attackSurfacePressureRating",
+            "note"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "contextWindowUtilization": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Context window utilization percentage at time of assessment."
+            },
+            "qualityPressureRating": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical",
+                "not-assessed"
+              ],
+              "description": "Rated quality degradation pressure from SoftMax crowding (Lemma 1)."
+            },
+            "attackSurfacePressureRating": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical",
+                "not-assessed"
+              ],
+              "description": "Rated attack surface expansion pressure from context crowding."
+            },
+            "note": {
+              "type": "string",
+              "description": "Human-readable explanation of the assessment."
+            }
+          }
+        },
+        "overallRiskRating": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "none",
+            "not-assessed"
+          ],
+          "description": "Overall risk rating for this session."
+        },
+        "riskRationale": {
+          "type": "string",
+          "description": "Human-readable justification for the overall risk rating."
+        },
+        "auditTrailComplete": {
+          "type": "boolean",
+          "description": "Whether all context components have complete audit records."
+        },
+        "sessionAuditClean": {
+          "type": "boolean",
+          "description": "True only if there are zero open findings. Analogous to SBOM clean-bill-of-health for container deployment."
+        },
+        "auditCleanBlockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Finding IDs that must be resolved before this session is marked audit-clean."
+        },
+        "templateOverheadTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tokens contributed by the chat template scaffolding/special tokens, attributed to no component. contextWindowTokensUsed = totalContextTokens + templateOverheadTokens."
+        }
+      }
+    },
+    "schema": {
+      "type": "object",
+      "description": "Self-documentation block for the CxBOM schema version and field glossary.",
+      "required": [
+        "cxbomVersion",
+        "fieldGlossary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "cxbomVersion": {
+          "type": "string",
+          "description": "CxBOM specification version this document was authored against."
+        },
+        "fieldGlossary": {
+          "type": "object",
+          "description": "Machine-readable glossary mapping field paths to human-readable descriptions.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "illustrative": {
+      "type": "boolean",
+      "description": "True for hand-authored illustrative records; false for records emitted from a real session. Lets consumers machine-separate the two."
+    },
+    "catalogVersions": {
+      "type": "object",
+      "description": "Pinned catalog versions every mapping in this CxBOM targets. The four taxonomy catalogs carry a contentHash the crosswalk validator recomputes; cyclonedx is a parent-spec pointer.",
+      "required": [
+        "owaspLlm",
+        "owaspAgentic",
+        "cwe",
+        "atlas"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "owaspLlm": {
+          "$ref": "#/definitions/catalogPinHashed"
+        },
+        "owaspAgentic": {
+          "$ref": "#/definitions/catalogPinHashed"
+        },
+        "cwe": {
+          "$ref": "#/definitions/catalogPinHashed"
+        },
+        "atlas": {
+          "$ref": "#/definitions/catalogPinHashed"
+        },
+        "cyclonedx": {
+          "$ref": "#/definitions/catalogPinPointer"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "trustRing": {
+      "type": "object",
+      "description": "A trust ring definition within the trust model.",
+      "required": [
+        "ring",
+        "designation",
+        "description",
+        "controlLayer",
+        "integrityRequirement",
+        "allowedSources",
+        "externalSourcesPermitted"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ring": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Ring number. 0=highest intended authority (operator), 2=lowest (user). Pre-inference classification only."
+        },
+        "designation": {
+          "type": "string",
+          "enum": [
+            "operator",
+            "agent",
+            "user"
+          ],
+          "description": "Named designation for this ring."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this trust ring."
+        },
+        "controlLayer": {
+          "type": "string",
+          "enum": [
+            "system-prompt",
+            "ingress",
+            "tool-execution",
+            "reasoning",
+            "egress",
+            "infrastructure"
+          ],
+          "description": "Primary control layer associated with this ring."
+        },
+        "integrityRequirement": {
+          "type": "string",
+          "enum": [
+            "cryptographic",
+            "hash-verified",
+            "sanitized"
+          ],
+          "description": "Required integrity verification level for content entering at this ring."
+        },
+        "allowedSources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Permitted content sources for this ring."
+        },
+        "externalSourcesPermitted": {
+          "type": "boolean",
+          "description": "Whether content from external (non-operator-controlled) sources is permitted at this ring."
+        },
+        "externalSourceRequirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Requirements that external sources must satisfy if externalSourcesPermitted is true."
+        }
+      }
+    },
+    "contextComponent": {
+      "type": "object",
+      "description": "A single discrete component assembled into the context window.",
+      "required": [
+        "id",
+        "type",
+        "subtype",
+        "trustRing",
+        "trustTier",
+        "controlLayer",
+        "label",
+        "assembledAtTurn",
+        "source",
+        "content",
+        "sanitization",
+        "permissions",
+        "auditFlags",
+        "injectionRiskRating",
+        "findingRefs"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^cc-\\d+$",
+          "description": "Unique component identifier within this CxBOM (e.g., 'cc-001')."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "system-prompt",
+            "tool-definition",
+            "tool-result",
+            "retrieved-document",
+            "user-turn"
+          ],
+          "description": "Component type classification."
+        },
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "primary-operator-instruction",
+            "heartbeat-injection",
+            "internal-operator-authored",
+            "external-mcp-server",
+            "internal-erp-query",
+            "external-api-response",
+            "rag-chunk",
+            "memory-injection",
+            "vector-result",
+            "conversational-query"
+          ],
+          "description": "Subtype from the CxBOM component taxonomy."
+        },
+        "trustRing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Trust ring assignment (0=operator, 1=agent, 2=user). Pre-inference classification only and does NOT confer computational privilege. Model-generated Ring 1 content (assistant turns re-entering the context) keeps trustRing 1 and is distinguished at the tier level as trustTier ring-1-derived."
+        },
+        "trustTier": {
+          "type": "string",
+          "enum": [
+            "operator",
+            "agent",
+            "user",
+            "ring-1-derived"
+          ],
+          "description": "Named trust tier for the component. operator = Ring 0 (operator scaffold), agent = Ring 1 (external and model-derived content), user = Ring 2 (user input). ring-1-derived marks model-generated content (assistant turns that re-enter the context and can carry an earlier injection forward) which inherits Ring 1 provenance (trustRing 1). Paper vocabulary: trust ring (0, 1, ring-1-derived, or 2)."
+        },
+        "controlLayer": {
+          "type": "string",
+          "enum": [
+            "system-prompt",
+            "ingress",
+            "tool-execution",
+            "reasoning",
+            "egress",
+            "infrastructure"
+          ],
+          "description": "Control layer this component passes through."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label describing this component."
+        },
+        "assembledAtTurn": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversational turn number when this component was assembled into the context. Turn 0 = pre-conversation assembly."
+        },
+        "source": {
+          "$ref": "#/definitions/componentSource"
+        },
+        "content": {
+          "$ref": "#/definitions/componentContent"
+        },
+        "sanitization": {
+          "$ref": "#/definitions/componentSanitization"
+        },
+        "permissions": {
+          "$ref": "#/definitions/componentPermissions"
+        },
+        "toolDefinitionTrustInversion": {
+          "$ref": "#/definitions/toolDefinitionTrustInversion"
+        },
+        "caching": {
+          "type": "object",
+          "description": "Caching metadata for this component.",
+          "required": [
+            "cached"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "cached": {
+              "type": "boolean",
+              "description": "Whether this component is cached."
+            },
+            "cacheBreakpoint": {
+              "type": "string",
+              "description": "Cache breakpoint label (e.g., 'ring-0-invariant')."
+            },
+            "cacheTtlSeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Cache time-to-live in seconds."
+            }
+          }
+        },
+        "auditFlags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Machine-readable audit flags for automated SIEM ingestion (e.g., 'TRUST_INVERSION_DETECTED')."
+        },
+        "injectionRiskRating": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "none",
+            "not-assessed"
+          ],
+          "description": "Assessed injection risk rating for this component."
+        },
+        "findingRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "References to finding IDs associated with this component."
+        },
+        "notCollected": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Field paths the emitter declined to assert (unobservable on a controlled harness). Distinct from a false/true value; the validator forbids it on structurally-observable fields and forces a missingControls + auditCleanBlocker on security-relevant ones."
+        }
+      }
+    },
+    "componentSource": {
+      "type": "object",
+      "description": "Provenance and source metadata for a context component.",
+      "required": [
+        "origin",
+        "thirdParty"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "Source origin identifier (e.g., 'operator-vault', 'external-mcp-server', 'authenticated-user-session')."
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI of the source (e.g., vault://, mcp://, config://)."
+        },
+        "retrievedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when this content was retrieved from the source."
+        },
+        "authorizedBy": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Entity that authorized this content's inclusion. Null if no authorization was performed."
+        },
+        "thirdParty": {
+          "type": "boolean",
+          "description": "Whether this content originates from a third-party (non-operator-controlled) source."
+        },
+        "operatorControlled": {
+          "type": "boolean",
+          "description": "Whether the source infrastructure is controlled by the operator."
+        },
+        "serverOperator": {
+          "type": "string",
+          "description": "Name of the external server operator (for MCP/external sources)."
+        },
+        "serverVersion": {
+          "type": "string",
+          "description": "Version of the external server."
+        },
+        "serverVersionPinned": {
+          "type": "boolean",
+          "description": "Whether the external server version is pinned in deployment configuration."
+        },
+        "serverChecksumVerified": {
+          "type": "boolean",
+          "description": "Whether the external server's content checksum has been verified."
+        },
+        "serverLastSecurityAudit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Timestamp of the external server's last security audit. Null if never audited."
+        },
+        "serverOperatorIdentityVerified": {
+          "type": "boolean",
+          "description": "Whether the external server operator's identity has been verified."
+        },
+        "userIdHash": {
+          "type": "string",
+          "description": "Hashed user identifier (for user-turn sources)."
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session identifier associated with this source."
+        },
+        "ipHash": {
+          "type": "string",
+          "description": "Hashed IP address of the source (for user-turn sources)."
+        },
+        "authenticatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of user authentication."
+        },
+        "authMethod": {
+          "type": "string",
+          "description": "Authentication method used (e.g., 'oauth2-pkce')."
+        },
+        "vectorStoreId": {
+          "type": "string",
+          "description": "Identifier of the vector store (for RAG/retrieved-document sources)."
+        },
+        "documentId": {
+          "type": "string",
+          "description": "Source document identifier."
+        },
+        "documentSha256": {
+          "type": "string",
+          "description": "SHA-256 hash of the source document.",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "chunkId": {
+          "type": "string",
+          "description": "Identifier of the specific chunk retrieved."
+        },
+        "tenantNamespaced": {
+          "type": "boolean",
+          "description": "Whether the vector store enforces tenant namespace isolation."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Tenant identifier for namespace isolation."
+        },
+        "accessControlVerified": {
+          "type": "boolean",
+          "description": "Whether access control was verified for this retrieval."
+        },
+        "toolId": {
+          "type": "string",
+          "description": "Tool identifier (for tool-result sources)."
+        },
+        "toolVersion": {
+          "type": "string",
+          "description": "Tool version."
+        },
+        "invokedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the tool was invoked."
+        },
+        "sandboxed": {
+          "type": "boolean",
+          "description": "Whether the tool executed in a sandboxed environment."
+        },
+        "executionEnvironment": {
+          "type": "string",
+          "description": "Execution environment type (e.g., 'isolated-container')."
+        },
+        "runtimeVersion": {
+          "type": "string",
+          "description": "Runtime version in the execution environment."
+        },
+        "serverChecksum": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Recorded SHA-256 an integrity boolean (serverChecksumVerified) binds to. Required present when that boolean is true."
+        },
+        "contentSignature": {
+          "type": "string",
+          "description": "Detached signature binding a trust-elevating provenance claim."
+        }
+      }
+    },
+    "componentContent": {
+      "type": "object",
+      "description": "Content metadata for a context component. Includes token accounting for SoftMax attention pressure analysis.",
+      "required": [
+        "sha256",
+        "tokenCount",
+        "contextualSharePercent",
+        "positionInContext",
+        "encodingState",
+        "normalizationApplied"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "description": "SHA-256 hash of the component content for integrity verification.",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tokenCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of tokens this component occupies in the context window."
+        },
+        "contextualSharePercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "This component's token count as a percentage of total context tokens used. Contributes to SoftMax attention distribution pressure analysis (Lemma 1)."
+        },
+        "positionInContext": {
+          "type": "string",
+          "description": "Where in the context window this component is positioned (e.g., 'prepended', 'tool-schema-block', 'user-turn-1')."
+        },
+        "encodingState": {
+          "type": "string",
+          "description": "Character encoding state of the content (e.g., 'utf-8-nfc')."
+        },
+        "normalizationApplied": {
+          "type": "boolean",
+          "description": "Whether text normalization was applied to this content."
+        },
+        "normalizationMethod": {
+          "type": "string",
+          "description": "Normalization method applied (e.g., 'unicode-nfc-plus-control-strip')."
+        },
+        "dataClassification": {
+          "type": "string",
+          "description": "Data classification level (e.g., 'confidential-financial', 'public')."
+        },
+        "containsPII": {
+          "type": "boolean",
+          "description": "Whether this content contains personally identifiable information."
+        },
+        "containsCredentials": {
+          "type": "boolean",
+          "description": "Whether this content contains credentials."
+        },
+        "containsSecretsOrKeys": {
+          "type": "boolean",
+          "description": "Whether this content contains secrets or API keys."
+        },
+        "embeddingModel": {
+          "type": "string",
+          "description": "Embedding model used for retrieval (for RAG components)."
+        },
+        "embeddingModelVersion": {
+          "type": "string",
+          "description": "Version of the embedding model."
+        },
+        "similarityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Cosine similarity score from vector retrieval."
+        },
+        "retrievalQuery": {
+          "type": "string",
+          "description": "Retrieval query (hashed or redacted for privacy)."
+        }
+      }
+    },
+    "componentSanitization": {
+      "type": "object",
+      "description": "Sanitization state of a context component. Records both applied AND missing controls (the principle of missing controls).",
+      "$comment": "The principle of missing controls: it is not sufficient to record what sanitization WAS applied. A CxBOM MUST also record what controls SHOULD have been applied but were not. This is analogous to recording both installed and missing security patches in an SBOM.",
+      "required": [
+        "status",
+        "appliedControls"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "clean",
+            "scanned-with-warnings",
+            "scanned-with-failures",
+            "not-scanned",
+            "not-assessed"
+          ],
+          "description": "Overall sanitization status."
+        },
+        "appliedControls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of sanitization controls that were applied."
+        },
+        "missingControls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Controls that SHOULD have been applied but were not. Explicit recording of missing controls is a core CxBOM principle."
+        },
+        "scanner": {
+          "type": "string",
+          "description": "Name of the scanning tool or service."
+        },
+        "scannerVersion": {
+          "type": "string",
+          "description": "Version of the scanning tool."
+        },
+        "scannedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when scanning was performed."
+        },
+        "trustLabel": {
+          "type": "string",
+          "description": "Trust label injected into the content for in-context trust boundary marking."
+        }
+      }
+    },
+    "componentPermissions": {
+      "type": "object",
+      "description": "Declared permissions and capability scope for this component.",
+      "required": [
+        "permittedActions",
+        "deniedActions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "permittedActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Actions this component is permitted to trigger."
+        },
+        "deniedActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Actions explicitly denied for this component."
+        },
+        "overrideResistanceDeclared": {
+          "type": "boolean",
+          "description": "Whether the component declares override resistance (i.e., instructions that lower-ring content cannot override it)."
+        },
+        "confidentialityInstructionPresent": {
+          "type": "boolean",
+          "description": "Whether the component contains confidentiality instructions."
+        },
+        "negativeCapabilityListPresent": {
+          "type": "boolean",
+          "description": "Whether the component contains a negative capability list (explicit list of what the agent must NOT do)."
+        },
+        "capabilityScope": {
+          "type": "string",
+          "description": "Declared capability scope (e.g., 'read-only', 'unverified')."
+        },
+        "capabilityPermitListVerified": {
+          "type": "boolean",
+          "description": "Whether the component's capabilities have been verified against an operator permit list."
+        }
+      }
+    },
+    "toolDefinitionTrustInversion": {
+      "type": "object",
+      "description": "Records whether a tool definition exhibits trust inversion: the condition where a component's source provenance trust ring is lower than its positional authority in the context window. See ATACE Section 1.5, Finding 1.",
+      "$comment": "Tool Definition Trust Inversion occurs when external tool definitions are assembled into the context window with Ring 0-equivalent positional authority despite carrying Ring 1 or Ring 2 provenance. Token Democracy ensures these definitions receive equal computational weight to operator-authored instructions. Positional authority here is pre-inference structural/assembly salience (assembled without a trust-downgrade boundary, given the same formatting and ordering as operator content), explicitly distinct from computational attention weight, which Token Democracy makes uniform. Trust inversion is the assembly-time failure, not an attention-level claim.",
+      "required": [
+        "detected"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "detected": {
+          "type": "boolean",
+          "description": "Whether trust inversion was detected for this tool definition."
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ],
+          "description": "Severity of the trust inversion. Required when detected=true."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the trust inversion."
+        },
+        "formalRef": {
+          "type": "string",
+          "description": "Reference to formal result or paper section documenting this class of vulnerability."
+        },
+        "positionalAuthority": {
+          "type": "string",
+          "description": "The effective positional authority this definition has in the context window (e.g., 'ring-0-equivalent')."
+        },
+        "claimedAuthority": {
+          "type": "string",
+          "description": "The trust ring the source claims or is classified under."
+        },
+        "authorityMismatch": {
+          "type": "boolean",
+          "description": "Whether there is a mismatch between positional authority and claimed authority."
+        },
+        "mitigationStatus": {
+          "type": "string",
+          "enum": [
+            "none",
+            "partial",
+            "full"
+          ],
+          "description": "Current mitigation status for this trust inversion."
+        },
+        "mitigationApplied": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Mitigations that have been applied."
+        },
+        "mitigationRequired": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Mitigations required to fully address the trust inversion."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation when detected=false, documenting why trust inversion does not apply."
+        }
+      },
+      "if": {
+        "properties": {
+          "detected": {
+            "const": true
+          }
+        },
+        "required": [
+          "detected"
+        ]
+      },
+      "then": {
+        "required": [
+          "detected",
+          "severity",
+          "description",
+          "mitigationStatus"
+        ]
+      }
+    },
+    "controlLayer": {
+      "type": "object",
+      "description": "A defense-in-depth control layer. Records both active and inactive controls — inactive controls represent coverage gaps that must be explicitly documented.",
+      "required": [
+        "layerId",
+        "designation",
+        "description",
+        "owaspCoverage",
+        "controlsActive",
+        "controlsInactive",
+        "status",
+        "coverageGaps"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "layerId": {
+          "type": "string",
+          "enum": [
+            "ingress",
+            "system-prompt",
+            "reasoning",
+            "tool-execution",
+            "egress",
+            "infrastructure"
+          ],
+          "description": "Unique layer identifier."
+        },
+        "designation": {
+          "type": "string",
+          "description": "Human-readable layer designation."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the layer's purpose and scope."
+        },
+        "owaspCoverage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^LLM(0[1-9]|10)$"
+          },
+          "description": "OWASP LLM Top 10 categories this layer addresses (LLM01-LLM10)."
+        },
+        "controlsActive": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Controls that are currently active and operational in this layer."
+        },
+        "controlsInactive": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Controls that are defined but not currently active. These represent explicit coverage gaps."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "partial",
+            "inactive"
+          ],
+          "description": "Operational status of this layer. 'active'=all controls operational, 'partial'=some controls inactive, 'inactive'=layer not operational."
+        },
+        "coverageGaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Human-readable descriptions of coverage gaps in this layer."
+        },
+        "findingRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "References to finding IDs associated with gaps in this layer."
+        },
+        "agenticCoverage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ASI(0[1-9]|10)$"
+          },
+          "description": "OWASP Agentic Top 10 (ASI) categories this layer addresses."
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "description": "A security finding identified during CxBOM audit. Structure mirrors CVE records with three-tier remediation.",
+      "required": [
+        "id",
+        "title",
+        "severity",
+        "category",
+        "cweRef",
+        "owaspRefs",
+        "formalRef",
+        "affectedComponents",
+        "affectedLayers",
+        "description",
+        "evidence",
+        "remediation",
+        "status",
+        "detectedAt"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^finding-\\d+$",
+          "description": "Unique finding identifier within this CxBOM (e.g., 'finding-001')."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short descriptive title for the finding."
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ],
+          "description": "Severity rating for this finding."
+        },
+        "category": {
+          "type": "string",
+          "description": "Finding category (e.g., 'trust-inversion', 'injection', 'data-leakage')."
+        },
+        "cweRef": {
+          "type": "string",
+          "description": "Common Weakness Enumeration reference (e.g., 'CWE-345')."
+        },
+        "owaspRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^LLM(0[1-9]|10)$"
+          },
+          "description": "OWASP LLM Top 10 references."
+        },
+        "formalRef": {
+          "type": "string",
+          "description": "Reference to ATACE Working Group formal result or paper section."
+        },
+        "affectedComponents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Context component IDs affected by this finding."
+        },
+        "affectedLayers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Control layer IDs affected by this finding."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the finding."
+        },
+        "evidence": {
+          "type": "object",
+          "description": "Evidence supporting this finding.",
+          "required": [
+            "componentId",
+            "sourceUri"
+          ],
+          "properties": {
+            "componentId": {
+              "type": "string",
+              "description": "Primary component ID where the finding was detected."
+            },
+            "sourceUri": {
+              "type": "string",
+              "description": "URI of the source that triggered the finding."
+            }
+          },
+          "additionalProperties": true
+        },
+        "remediation": {
+          "type": "object",
+          "description": "Three-tier remediation plan: immediate (hours), short-term (days-weeks), strategic (weeks-months).",
+          "required": [
+            "immediate",
+            "shortTerm",
+            "strategic"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "immediate": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Actions to take immediately (within hours)."
+            },
+            "shortTerm": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Actions to complete in the short term (days to weeks)."
+            },
+            "strategic": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Long-term strategic remediation actions (weeks to months)."
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "mitigated",
+            "resolved",
+            "accepted"
+          ],
+          "description": "Current status of this finding."
+        },
+        "detectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when this finding was detected."
+        },
+        "slaDeadline": {
+          "type": "string",
+          "format": "date-time",
+          "description": "SLA deadline for remediation."
+        },
+        "agenticRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ASI(0[1-9]|10)$"
+          },
+          "description": "OWASP Agentic Top 10 (ASI) references."
+        }
+      }
+    },
+    "ringBreakdown": {
+      "type": "object",
+      "description": "Token breakdown for a single trust ring.",
+      "required": [
+        "tokens",
+        "sharePercent",
+        "components"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens in this ring."
+        },
+        "sharePercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of total context tokens in this ring."
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Component IDs in this ring."
+        }
+      }
+    },
+    "typeBreakdown": {
+      "type": "object",
+      "description": "Token breakdown for a component type.",
+      "required": [
+        "tokens",
+        "sharePercent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens of this type."
+        },
+        "sharePercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of total context tokens of this type."
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional explanatory note."
+        }
+      }
+    },
+    "catalogPinHashed": {
+      "type": "object",
+      "description": "A pinned, content-hashed catalog snapshot.",
+      "required": [
+        "version",
+        "url",
+        "contentHash",
+        "released"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "releaseTag": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Non-null only for an officially released catalog. Null blocks submission-mode."
+        },
+        "released": {
+          "type": "boolean"
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the vendored {id:name} snapshot."
+        }
+      }
+    },
+    "catalogPinPointer": {
+      "type": "object",
+      "description": "A pointer to a parent specification (no vendored id->name snapshot to hash).",
+      "required": [
+        "version",
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

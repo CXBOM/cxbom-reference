@@ -1,0 +1,590 @@
+{
+  "bomFormat": "CxBOM",
+  "specVersion": "0.3.0",
+  "illustrative": false,
+  "extends": {
+    "format": "CycloneDX",
+    "version": "1.6",
+    "schema": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+  },
+  "serialNumber": "urn:uuid:c0bc0b00-0000-4000-8000-000000000002",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-07-12T00:00:00Z",
+    "generatedBy": {
+      "name": "cxbom-emitter",
+      "version": "0.1.0",
+      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+    },
+    "session": {
+      "id": "sess_reference_50k",
+      "model": {
+        "family": "phi",
+        "version": "Phi-3.5-mini-instruct",
+        "provider": "Microsoft",
+        "contextWindowMaxTokens": 131072,
+        "architectureType": "transformer-decoder"
+      },
+      "contextWindowTokensUsed": 46205,
+      "contextWindowUtilizationPercent": 35.25,
+      "turnCount": 1,
+      "startedAt": "2026-07-12T00:00:00Z",
+      "endedAt": "2026-07-12T00:00:00Z"
+    },
+    "agent": {
+      "id": "agent_reference",
+      "name": "CxBOM Reference Agent",
+      "version": "0.1.0",
+      "operator": "ATACE Working Group",
+      "deploymentEnvironment": "testing",
+      "deploymentId": "deploy_reference"
+    }
+  },
+  "trustModel": {
+    "description": "Three-ring trust tier model. Ring authority is a pre-inference classification only. No trust tier receives different treatment inside the model.",
+    "rings": [
+      {
+        "ring": 0,
+        "designation": "operator",
+        "description": "Operator-authored.",
+        "controlLayer": "system-prompt",
+        "integrityRequirement": "cryptographic",
+        "allowedSources": [
+          "operator-vault"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 1,
+        "designation": "agent",
+        "description": "Agent-mediated (tools, retrieval).",
+        "controlLayer": "tool-execution",
+        "integrityRequirement": "hash-verified",
+        "allowedSources": [
+          "approved-mcp-servers",
+          "public-corpus"
+        ],
+        "externalSourcesPermitted": true
+      },
+      {
+        "ring": 2,
+        "designation": "user",
+        "description": "User input.",
+        "controlLayer": "ingress",
+        "integrityRequirement": "sanitized",
+        "allowedSources": [
+          "authenticated-user-session"
+        ],
+        "externalSourcesPermitted": false
+      }
+    ]
+  },
+  "contextComponents": [
+    {
+      "id": "cc-001",
+      "type": "system-prompt",
+      "subtype": "primary-operator-instruction",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "system-prompt",
+      "label": "Operator system prompt",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-vault",
+        "uri": "vault://ref/system-prompt",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "5e8dbdb34d772982cc04929375854227038243cff284e064951e13bac5f8ba31",
+        "tokenCount": 45,
+        "contextualSharePercent": 0.1,
+        "positionInContext": "prepended",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": false
+      },
+      "sanitization": {
+        "status": "not-assessed",
+        "appliedControls": [],
+        "missingControls": [
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [],
+        "deniedActions": []
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "not-assessed",
+      "notCollected": [
+        "injectionRiskRating",
+        "sanitization.scanner"
+      ],
+      "findingRefs": []
+    },
+    {
+      "id": "cc-002",
+      "type": "tool-definition",
+      "subtype": "external-mcp-server",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "External MCP tool definition (fetch)",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "external-mcp-server",
+        "uri": "mcp://fetch/tools",
+        "thirdParty": true,
+        "operatorControlled": false,
+        "serverOperator": "modelcontextprotocol/servers (fetch tool)",
+        "serverVersionPinned": false
+      },
+      "content": {
+        "sha256": "473bd033941a519a66d3cf06f20adc47ea0febafe9bd14ec172628cd9a5f65dc",
+        "tokenCount": 357,
+        "contextualSharePercent": 0.77,
+        "positionInContext": "tool-schema-block",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": false
+      },
+      "sanitization": {
+        "status": "not-assessed",
+        "appliedControls": [],
+        "missingControls": [
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [],
+        "deniedActions": []
+      },
+      "auditFlags": [
+        "TRUST_INVERSION_DETECTED"
+      ],
+      "injectionRiskRating": "not-assessed",
+      "notCollected": [
+        "injectionRiskRating",
+        "sanitization.scanner"
+      ],
+      "findingRefs": [
+        "finding-001"
+      ],
+      "toolDefinitionTrustInversion": {
+        "detected": true,
+        "severity": "high",
+        "description": "External tool definition assembled in a tool-schema block with ring-0-equivalent positional authority and no trust-downgrade boundary (structural detection).",
+        "positionalAuthority": "ring-0-equivalent",
+        "claimedAuthority": "ring-1",
+        "authorityMismatch": true,
+        "mitigationStatus": "none",
+        "mitigationRequired": [
+          "trust-tier-downgrade-label",
+          "server-integrity-verification"
+        ]
+      }
+    },
+    {
+      "id": "cc-003",
+      "type": "retrieved-document",
+      "subtype": "rag-chunk",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "Retrieved public-domain document chunk 1",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "public-domain-corpus",
+        "uri": "doc://public-domain/federalist/chunk-1",
+        "documentId": "federalist-chunk-1",
+        "thirdParty": true
+      },
+      "content": {
+        "sha256": "cc7647c5a474fb95950eba33abdafdb7589295f3705d8fbea7c8d4fcf6621c76",
+        "tokenCount": 15710,
+        "contextualSharePercent": 34.01,
+        "positionInContext": "retrieved-content",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": false
+      },
+      "sanitization": {
+        "status": "not-assessed",
+        "appliedControls": [],
+        "missingControls": [
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [],
+        "deniedActions": []
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "not-assessed",
+      "notCollected": [
+        "injectionRiskRating",
+        "sanitization.scanner"
+      ],
+      "findingRefs": []
+    },
+    {
+      "id": "cc-004",
+      "type": "retrieved-document",
+      "subtype": "rag-chunk",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "Retrieved public-domain document chunk 2",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "public-domain-corpus",
+        "uri": "doc://public-domain/federalist/chunk-2",
+        "documentId": "federalist-chunk-2",
+        "thirdParty": true
+      },
+      "content": {
+        "sha256": "8e1c8d540f41a570047543f9c32d1e8a3a4ba56760e4c358153428b71897bc71",
+        "tokenCount": 15283,
+        "contextualSharePercent": 33.09,
+        "positionInContext": "retrieved-content",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": false
+      },
+      "sanitization": {
+        "status": "not-assessed",
+        "appliedControls": [],
+        "missingControls": [
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [],
+        "deniedActions": []
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "not-assessed",
+      "notCollected": [
+        "injectionRiskRating",
+        "sanitization.scanner"
+      ],
+      "findingRefs": []
+    },
+    {
+      "id": "cc-005",
+      "type": "retrieved-document",
+      "subtype": "rag-chunk",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "Retrieved public-domain document chunk 3",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "public-domain-corpus",
+        "uri": "doc://public-domain/federalist/chunk-3",
+        "documentId": "federalist-chunk-3",
+        "thirdParty": true
+      },
+      "content": {
+        "sha256": "5e144afa348608e941c723758bf43f32f344459180f7f50e034d25097073857b",
+        "tokenCount": 14781,
+        "contextualSharePercent": 32.0,
+        "positionInContext": "retrieved-content",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": false
+      },
+      "sanitization": {
+        "status": "not-assessed",
+        "appliedControls": [],
+        "missingControls": [
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [],
+        "deniedActions": []
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "not-assessed",
+      "notCollected": [
+        "injectionRiskRating",
+        "sanitization.scanner"
+      ],
+      "findingRefs": []
+    },
+    {
+      "id": "cc-006",
+      "type": "user-turn",
+      "subtype": "conversational-query",
+      "trustRing": 2,
+      "trustTier": "user",
+      "controlLayer": "ingress",
+      "label": "User query, turn 1",
+      "assembledAtTurn": 1,
+      "source": {
+        "origin": "authenticated-user-session",
+        "thirdParty": false
+      },
+      "content": {
+        "sha256": "358ec8cfc70b3dcaede61e1717552752ec4c9d58aad92fdd911565a5ddb6d6b1",
+        "tokenCount": 16,
+        "contextualSharePercent": 0.03,
+        "positionInContext": "user-turn-1",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": false
+      },
+      "sanitization": {
+        "status": "not-assessed",
+        "appliedControls": [],
+        "missingControls": [
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [],
+        "deniedActions": []
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "not-assessed",
+      "notCollected": [
+        "injectionRiskRating",
+        "sanitization.scanner"
+      ],
+      "findingRefs": []
+    }
+  ],
+  "controlLayers": [
+    {
+      "layerId": "system-prompt",
+      "designation": "System Prompt (Ring 0)",
+      "description": "Operator instruction governance.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM03"
+      ],
+      "agenticCoverage": [
+        "ASI01"
+      ],
+      "controlsActive": [
+        "trust-boundary-labeling"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "tool-execution",
+      "designation": "Tool Execution",
+      "description": "Real-system action boundary.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04"
+      ],
+      "agenticCoverage": [
+        "ASI02",
+        "ASI04"
+      ],
+      "controlsActive": [
+        "tool-output-injection-scan"
+      ],
+      "controlsInactive": [
+        "external-mcp-server-integrity-verification",
+        "trust-tier-downgrade-label-for-external-definitions"
+      ],
+      "status": "partial",
+      "coverageGaps": [
+        "External MCP tool definitions admitted without integrity verification or downgrade labeling."
+      ],
+      "findingRefs": [
+        "finding-001"
+      ]
+    },
+    {
+      "layerId": "reasoning",
+      "designation": "Agent Reasoning",
+      "description": "Long-context handling and scope enforcement.",
+      "owaspCoverage": [
+        "LLM06"
+      ],
+      "controlsActive": [],
+      "controlsInactive": [
+        "least-context-pruning"
+      ],
+      "status": "partial",
+      "coverageGaps": [
+        "No principled context budget; a large retrieved corpus dominates the window."
+      ]
+    },
+    {
+      "layerId": "ingress",
+      "designation": "Ingress",
+      "description": "Input validation and authentication.",
+      "owaspCoverage": [
+        "LLM01"
+      ],
+      "controlsActive": [
+        "authentication"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-001",
+      "title": "Tool Definition Trust Inversion",
+      "severity": "high",
+      "category": "trust-inversion",
+      "cweRef": "CWE-345",
+      "owaspRefs": [
+        "LLM01",
+        "LLM04"
+      ],
+      "agenticRefs": [
+        "ASI02",
+        "ASI04"
+      ],
+      "formalRef": "",
+      "affectedComponents": [
+        "cc-002"
+      ],
+      "affectedLayers": [
+        "tool-execution"
+      ],
+      "description": "External tool definition assembled in a tool-schema block with ring-0-equivalent positional authority and no trust-downgrade boundary (structural detection).",
+      "evidence": {
+        "componentId": "cc-002",
+        "sourceUri": "mcp://fetch/tools"
+      },
+      "remediation": {
+        "immediate": [
+          "Apply a trust-tier-downgrade label to the external tool definition"
+        ],
+        "shortTerm": [
+          "Pin and integrity-verify the external server"
+        ],
+        "strategic": [
+          "Enforce ring-1 classification for external tool definitions at assembly time"
+        ]
+      },
+      "status": "open",
+      "detectedAt": "2026-07-12T00:00:00Z"
+    }
+  ],
+  "sessionSummary": {
+    "totalContextTokens": 46192,
+    "templateOverheadTokens": 13,
+    "componentBreakdown": {
+      "byTrustRing": {
+        "ring0": {
+          "tokens": 45,
+          "sharePercent": 0.1,
+          "components": [
+            "cc-001"
+          ]
+        },
+        "ring1": {
+          "tokens": 46131,
+          "sharePercent": 99.87,
+          "components": [
+            "cc-002",
+            "cc-003",
+            "cc-004",
+            "cc-005"
+          ]
+        },
+        "ring2": {
+          "tokens": 16,
+          "sharePercent": 0.03,
+          "components": [
+            "cc-006"
+          ]
+        }
+      },
+      "byType": {
+        "systemPrompt": {
+          "tokens": 45,
+          "sharePercent": 0.1
+        },
+        "toolDefinition": {
+          "tokens": 357,
+          "sharePercent": 0.77
+        },
+        "retrievedDocument": {
+          "tokens": 45774,
+          "sharePercent": 99.1
+        },
+        "userTurn": {
+          "tokens": 16,
+          "sharePercent": 0.03
+        }
+      }
+    },
+    "findingsSummary": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "low": 0,
+      "totalOpen": 1
+    },
+    "controlLayerStatus": {
+      "active": [
+        "system-prompt",
+        "ingress"
+      ],
+      "partial": [
+        "tool-execution",
+        "reasoning"
+      ],
+      "inactive": []
+    },
+    "overallRiskRating": "high",
+    "riskRationale": "One structural trust-inversion finding.",
+    "auditTrailComplete": true,
+    "sessionAuditClean": false,
+    "auditCleanBlockers": [
+      "finding-001"
+    ]
+  },
+  "schema": {
+    "cxbomVersion": "0.3.0",
+    "fieldGlossary": {
+      "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
+      "contextualSharePercent": "This component's token count as a percentage of total context tokens used."
+    }
+  },
+  "catalogVersions": {
+    "owaspLlm": {
+      "version": "2026",
+      "url": "https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "a27034a5c2ebc53fe14a7394e984428944e40a5def3a18f64abf1deb4beffa33",
+      "commit": "d027bb64",
+      "ref": "2026-final"
+    },
+    "owaspAgentic": {
+      "version": "2026",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "d5a247ea0646193bc4e58810c9088d414a7d685b66e24f55f9b047a64acee467"
+    },
+    "cwe": {
+      "version": "CWE",
+      "url": "https://cwe.mitre.org/",
+      "released": true,
+      "releaseTag": "CWE (verified 2026-07-11)",
+      "contentHash": "97c45c50ef6602e71c7113bc0cb153d60ab2bfc1bee63e9a352d1dffb8a3fd67"
+    },
+    "atlas": {
+      "version": "ATLAS",
+      "url": "https://github.com/mitre-atlas/atlas-data",
+      "released": true,
+      "releaseTag": "MITRE ATLAS (verified 2026-07-11)",
+      "contentHash": "a9b3f97ca72f01bf5d1748ed20292e9bf5d4d12bea8777db98a0d2075f06e176"
+    },
+    "cyclonedx": {
+      "version": "1.6",
+      "url": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+    }
+  }
+}

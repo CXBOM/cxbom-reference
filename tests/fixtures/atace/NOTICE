@@ -1,0 +1,5 @@
+Vendored third-party artifacts (externally authored; used to break the
+producer-equals-consumer circularity):
+- mcp_tool_def.json: the real "fetch" tool schema from mcp-server-fetch
+  (modelcontextprotocol/servers), MIT-licensed. inputSchema extracted verbatim.
+- rag_doc.txt: Preamble to the U.S. Constitution (1787), public domain.

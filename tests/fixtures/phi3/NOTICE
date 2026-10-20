@@ -1,0 +1,3 @@
+Phi-3.5-mini-instruct tokenizer files (tokenizer.json, tokenizer_config.json).
+Copyright Microsoft. Licensed under MIT. Source repo commit 2fe192450127e6a83f7441aef6e3ca586c338b77.
+Only tokenizer files are vendored; no model weights.

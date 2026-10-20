@@ -1,0 +1,744 @@
+{
+  "_comment": "CxBOM v0.3.0 — Example: Clean Audit-Passing Session — HR Benefits Inquiry Agent",
+  "_ref": "ATACE Working Group, Section 6 draft. Extends CycloneDX 1.6. This is the 'everything working correctly' reference case.",
+  "bomFormat": "CxBOM",
+  "specVersion": "0.3.0",
+  "extends": {
+    "format": "CycloneDX",
+    "version": "1.6",
+    "schema": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+  },
+  "serialNumber": "urn:uuid:e5f7a9b1-4d6f-4c8e-a0b2-5c7d9e1f3a5b",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-05-16T14:05:47Z",
+    "generatedBy": {
+      "name": "CxBOM Agent Audit Layer",
+      "version": "0.1.0",
+      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+    },
+    "session": {
+      "id": "sess_hr_7b3d5f1a9c2e",
+      "model": {
+        "family": "claude",
+        "version": "claude-sonnet-4-6",
+        "provider": "Anthropic",
+        "contextWindowMaxTokens": 200000,
+        "architectureType": "transformer-decoder"
+      },
+      "contextWindowTokensUsed": 152,
+      "contextWindowUtilizationPercent": 0.08,
+      "turnCount": 5,
+      "startedAt": "2026-05-16T13:55:00Z",
+      "endedAt": "2026-05-16T14:05:47Z"
+    },
+    "agent": {
+      "id": "agent_prod_hr_benefits",
+      "name": "HR Benefits Inquiry Agent",
+      "version": "1.8.3",
+      "operator": "Fabrikam HR Technology Team",
+      "deploymentEnvironment": "production",
+      "deploymentId": "deploy_fabrikam_hr_prod_v1"
+    }
+  },
+  "trustModel": {
+    "description": "Three-ring trust tier model. Ring authority is a pre-inference classification only. No trust tier receives different treatment inside the model.",
+    "rings": [
+      {
+        "ring": 0,
+        "designation": "operator",
+        "description": "Operator-authored content. Highest intended authority. Must originate from operator-controlled infrastructure and carry cryptographic integrity verification.",
+        "controlLayer": "system-prompt",
+        "integrityRequirement": "cryptographic",
+        "allowedSources": [
+          "operator-vault",
+          "internal-config-service"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 1,
+        "designation": "agent",
+        "description": "Agent-mediated content. Intermediate authority. Includes tool results from internal HRIS and retrieved documents from internal policy vector store.",
+        "controlLayer": "tool-execution",
+        "integrityRequirement": "hash-verified",
+        "allowedSources": [
+          "approved-tool-servers",
+          "internal-rag",
+          "internal-hris"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 2,
+        "designation": "user",
+        "description": "User-supplied conversational input. Lowest intended authority. Subject to full ingress sanitization pipeline.",
+        "controlLayer": "ingress",
+        "integrityRequirement": "sanitized",
+        "allowedSources": [
+          "authenticated-user-session"
+        ],
+        "externalSourcesPermitted": false
+      }
+    ]
+  },
+  "contextComponents": [
+    {
+      "id": "cc-001",
+      "type": "system-prompt",
+      "subtype": "primary-operator-instruction",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "system-prompt",
+      "label": "Primary operator system prompt — HR benefits inquiry agent (cryptographically verified)",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-vault",
+        "uri": "vault://fabrikam-ai/prompts/hr-benefits/v1.8.3",
+        "retrievedAt": "2026-05-16T13:55:00Z",
+        "authorizedBy": "operator-config-service",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "162331ab25ac45c9517420e895fd7ba437cc7335d97da497f4b3887cead517eb",
+        "tokenCount": 28,
+        "contextualSharePercent": 18.42,
+        "positionInContext": "prepended",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "control-character-strip",
+          "injection-pattern-scan",
+          "cryptographic-signature-verification"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "answer-benefits-queries",
+          "lookup-policy-documents",
+          "query-hris-read-only",
+          "schedule-hr-callback"
+        ],
+        "deniedActions": [
+          "modify-benefits-elections",
+          "access-compensation-data",
+          "access-performance-reviews",
+          "modify-employee-records",
+          "share-other-employee-data"
+        ],
+        "overrideResistanceDeclared": true,
+        "confidentialityInstructionPresent": true,
+        "negativeCapabilityListPresent": true
+      },
+      "caching": {
+        "cached": true,
+        "cacheBreakpoint": "ring-0-invariant",
+        "cacheTtlSeconds": 300
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-002",
+      "type": "tool-definition",
+      "subtype": "internal-operator-authored",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "tool-execution",
+      "label": "Internal HRIS query tool — operator-authored definition (read-only)",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-config-service",
+        "uri": "config://fabrikam-ai/tools/hris-query/v2.3.0",
+        "retrievedAt": "2026-05-16T13:55:01Z",
+        "authorizedBy": "operator-config-service",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "35704eadfc3ad26cb093803ead698bdc02f0576bed48dc60b49acd8a6c97726b",
+        "tokenCount": 23,
+        "contextualSharePercent": 15.13,
+        "positionInContext": "tool-schema-block",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "schema-validation",
+          "capability-permitlist-check",
+          "unicode-normalization",
+          "cryptographic-signature-verification"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "hris-read-benefits-enrollment",
+          "hris-read-plan-details"
+        ],
+        "deniedActions": [
+          "hris-write",
+          "hris-delete",
+          "hris-admin",
+          "hris-read-compensation",
+          "hris-read-performance"
+        ],
+        "capabilityScope": "read-only",
+        "capabilityPermitListVerified": true
+      },
+      "toolDefinitionTrustInversion": {
+        "detected": false,
+        "reason": "Operator-controlled source. Ring 0 provenance. Cryptographic signature verified. Capability permit list enforced."
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-003",
+      "type": "user-turn",
+      "subtype": "conversational-query",
+      "trustRing": 2,
+      "trustTier": "user",
+      "controlLayer": "ingress",
+      "label": "User query — turn 1: dental coverage options",
+      "assembledAtTurn": 1,
+      "source": {
+        "origin": "authenticated-user-session",
+        "userIdHash": "sha256:a1b2c3d4e5f678901234567890abcdef",
+        "sessionId": "sess_hr_7b3d5f1a9c2e",
+        "ipHash": "sha256:e5f6a7b8c9d01234",
+        "authenticatedAt": "2026-05-16T13:54:52Z",
+        "authMethod": "oauth2-pkce",
+        "thirdParty": false
+      },
+      "content": {
+        "sha256": "79cf45db5b8d8723db7b1888775e56aade9cd8fc4222517ba41686c32218a47a",
+        "tokenCount": 8,
+        "contextualSharePercent": 5.26,
+        "positionInContext": "user-turn-1",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip-plus-homoglyph-detect"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "homoglyph-detection",
+          "injection-pattern-scan",
+          "token-length-enforcement",
+          "rate-limit-check"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "query-agent"
+        ],
+        "deniedActions": [
+          "modify-system-prompt",
+          "invoke-tools-directly",
+          "override-ring-0"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-004",
+      "type": "user-turn",
+      "subtype": "conversational-query",
+      "trustRing": 2,
+      "trustTier": "user",
+      "controlLayer": "ingress",
+      "label": "User query — turn 3: open enrollment deadline question",
+      "assembledAtTurn": 3,
+      "source": {
+        "origin": "authenticated-user-session",
+        "userIdHash": "sha256:a1b2c3d4e5f678901234567890abcdef",
+        "sessionId": "sess_hr_7b3d5f1a9c2e",
+        "ipHash": "sha256:e5f6a7b8c9d01234",
+        "authenticatedAt": "2026-05-16T13:54:52Z",
+        "authMethod": "oauth2-pkce",
+        "thirdParty": false
+      },
+      "content": {
+        "sha256": "698959c652aa0d0acd581f57a1c07d61ac7faa16681655a759094336be4391fd",
+        "tokenCount": 10,
+        "contextualSharePercent": 6.58,
+        "positionInContext": "user-turn-3",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip-plus-homoglyph-detect"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "homoglyph-detection",
+          "injection-pattern-scan",
+          "token-length-enforcement",
+          "rate-limit-check"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "query-agent"
+        ],
+        "deniedActions": [
+          "modify-system-prompt",
+          "invoke-tools-directly",
+          "override-ring-0"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-005",
+      "type": "tool-result",
+      "subtype": "internal-erp-query",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "HRIS query result — employee benefits enrollment status",
+      "assembledAtTurn": 2,
+      "source": {
+        "origin": "internal-tool-server",
+        "toolId": "hris-query",
+        "toolVersion": "2.3.0",
+        "invokedAt": "2026-05-16T13:55:08Z",
+        "thirdParty": false,
+        "sandboxed": true,
+        "executionEnvironment": "isolated-container",
+        "runtimeVersion": "v8-22.0"
+      },
+      "content": {
+        "sha256": "ba7a91cdf4f69c503400b67b16e2420836d78c9383c9b78911b18bdf93ac26e7",
+        "tokenCount": 31,
+        "contextualSharePercent": 20.39,
+        "positionInContext": "tool-result-turn-2",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "dataClassification": "confidential-hr",
+        "containsPII": true,
+        "containsCredentials": false,
+        "containsSecretsOrKeys": false
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "pii-detection",
+          "credential-pattern-scan",
+          "structured-output-schema-validation",
+          "trust-label-injection"
+        ],
+        "trustLabel": "<tool_data source=\"hris-query\" trust=\"ring-1\" turn=\"2\">"
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "forward-to-user-unfiltered"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-006",
+      "type": "tool-result",
+      "subtype": "internal-erp-query",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "HRIS query result — open enrollment dates and plan comparison",
+      "assembledAtTurn": 4,
+      "source": {
+        "origin": "internal-tool-server",
+        "toolId": "hris-query",
+        "toolVersion": "2.3.0",
+        "invokedAt": "2026-05-16T14:01:15Z",
+        "thirdParty": false,
+        "sandboxed": true,
+        "executionEnvironment": "isolated-container",
+        "runtimeVersion": "v8-22.0"
+      },
+      "content": {
+        "sha256": "12ed6ecb6af7b26e2e1349aa287c1e8eb83a8315df500740cf3faae7ed72e66f",
+        "tokenCount": 27,
+        "contextualSharePercent": 17.76,
+        "positionInContext": "tool-result-turn-4",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "dataClassification": "confidential-hr",
+        "containsPII": false,
+        "containsCredentials": false,
+        "containsSecretsOrKeys": false
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "pii-detection",
+          "credential-pattern-scan",
+          "structured-output-schema-validation",
+          "trust-label-injection"
+        ],
+        "trustLabel": "<tool_data source=\"hris-query\" trust=\"ring-1\" turn=\"4\">"
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "forward-to-user-unfiltered"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-007",
+      "type": "retrieved-document",
+      "subtype": "vector-result",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "RAG retrieval — 2026 benefits policy handbook, dental section, chunk 014",
+      "assembledAtTurn": 2,
+      "source": {
+        "origin": "internal-vector-store",
+        "vectorStoreId": "vs_fabrikam_hr_policies",
+        "documentId": "doc_benefits_handbook_2026",
+        "documentSha256": "e9bfa903ce2442d0acd60f63b7164319dcc39ac7de1f7d575e41289fff03a332",
+        "chunkId": "chunk_014",
+        "retrievedAt": "2026-05-16T13:55:07Z",
+        "thirdParty": false,
+        "tenantNamespaced": true,
+        "tenantId": "fabrikam",
+        "accessControlVerified": true
+      },
+      "content": {
+        "sha256": "e9bfa903ce2442d0acd60f63b7164319dcc39ac7de1f7d575e41289fff03a332",
+        "tokenCount": 25,
+        "contextualSharePercent": 16.45,
+        "positionInContext": "retrieved-content-turn-2",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "embeddingModel": "text-embedding-3-large",
+        "embeddingModelVersion": "2024-12",
+        "similarityScore": 0.941,
+        "retrievalQuery": "[query-hash-only: sha256:f7e8d...]",
+        "dataClassification": "internal-hr-policy"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "trust-label-injection",
+          "pii-detection",
+          "unicode-normalization"
+        ],
+        "trustLabel": "<retrieved_doc source=\"internal-vector-store\" doc=\"doc_benefits_handbook_2026\" chunk=\"014\" trust=\"ring-1\">"
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "forward-to-user-unfiltered"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    }
+  ],
+  "controlLayers": [
+    {
+      "layerId": "ingress",
+      "designation": "Ingress",
+      "description": "Pre-model authentication, input validation, rate limiting, and content pre-classification.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM03"
+      ],
+      "controlsActive": [
+        "oauth2-pkce-authentication",
+        "token-length-cap",
+        "rate-limiter-per-user",
+        "rate-limiter-per-session",
+        "unicode-normalization",
+        "homoglyph-detector",
+        "injection-pre-classifier"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "system-prompt",
+      "designation": "System Prompt (Ring 0)",
+      "description": "Operator instruction governance, override-resistance declaration, trust boundary labeling.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM09"
+      ],
+      "controlsActive": [
+        "override-resistance-declaration",
+        "trust-boundary-xml-labeling",
+        "negative-capability-list",
+        "confidentiality-instruction",
+        "action-gate-declaration",
+        "cryptographic-prompt-verification"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "reasoning",
+      "designation": "Agent Reasoning",
+      "description": "In-flight behavioral monitoring, scope enforcement, confidence gating.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM08"
+      ],
+      "controlsActive": [
+        "thought-chain-monitor",
+        "scope-creep-detector",
+        "confidence-gate",
+        "human-in-loop-checkpoint"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "tool-execution",
+      "designation": "Tool Execution",
+      "description": "Real-system action boundary. HRIS query execution, output sanitization, trust labeling.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM05",
+        "LLM06"
+      ],
+      "controlsActive": [
+        "server-side-input-validation",
+        "tool-output-injection-scan",
+        "tool-output-trust-label-injection",
+        "execution-sandboxing",
+        "internal-tool-allowlist",
+        "pii-detection-on-tool-output",
+        "credential-scan-on-tool-output",
+        "capability-permitlist-enforcement"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": [],
+      "agenticCoverage": [
+        "ASI02",
+        "ASI04"
+      ]
+    },
+    {
+      "layerId": "egress",
+      "designation": "Output / Egress",
+      "description": "Post-inference content control, PII and credential scrubbing, schema enforcement, attribution logging.",
+      "owaspCoverage": [
+        "LLM02",
+        "LLM06",
+        "LLM08"
+      ],
+      "controlsActive": [
+        "pii-scrubber",
+        "credential-scrubber",
+        "output-content-classifier",
+        "schema-validator",
+        "response-attribution-logger"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "infrastructure",
+      "designation": "Infrastructure",
+      "description": "Observability fabric, immutable audit logging, model version pinning, secret management, network segmentation, vector DB access control.",
+      "owaspCoverage": [
+        "LLM03",
+        "LLM05",
+        "LLM07",
+        "LLM10"
+      ],
+      "controlsActive": [
+        "immutable-audit-log-siem-forwarding",
+        "anomaly-detector-token-usage",
+        "anomaly-detector-tool-call-frequency",
+        "model-version-pin-ci",
+        "system-prompt-vcs-signed-commits",
+        "network-egress-allowlist",
+        "vault-secret-management",
+        "secret-rotation-scheduled",
+        "vector-db-tenant-namespace",
+        "vector-db-auth-per-query",
+        "token-budget-enforcement-gateway"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    }
+  ],
+  "findings": [],
+  "sessionSummary": {
+    "totalContextTokens": 152,
+    "componentBreakdown": {
+      "byTrustRing": {
+        "ring0": {
+          "tokens": 51,
+          "sharePercent": 33.55,
+          "components": [
+            "cc-001",
+            "cc-002"
+          ]
+        },
+        "ring1": {
+          "tokens": 83,
+          "sharePercent": 54.61,
+          "components": [
+            "cc-005",
+            "cc-006",
+            "cc-007"
+          ]
+        },
+        "ring2": {
+          "tokens": 18,
+          "sharePercent": 11.84,
+          "components": [
+            "cc-003",
+            "cc-004"
+          ]
+        }
+      },
+      "byType": {
+        "systemPrompt": {
+          "tokens": 28,
+          "sharePercent": 18.42
+        },
+        "toolDefinition": {
+          "tokens": 23,
+          "sharePercent": 15.13
+        },
+        "userTurn": {
+          "tokens": 18,
+          "sharePercent": 11.84
+        },
+        "toolResult": {
+          "tokens": 58,
+          "sharePercent": 38.16
+        },
+        "retrievedDocument": {
+          "tokens": 25,
+          "sharePercent": 16.45
+        }
+      }
+    },
+    "findingsSummary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "totalOpen": 0
+    },
+    "controlLayerStatus": {
+      "active": [
+        "ingress",
+        "system-prompt",
+        "reasoning",
+        "tool-execution",
+        "egress",
+        "infrastructure"
+      ],
+      "partial": [],
+      "inactive": []
+    },
+    "overallRiskRating": "low",
+    "riskRationale": "Zero open findings. All six control layers fully active with no coverage gaps. Ring 0 share at 33.55% (healthy). Context utilization at 0.08% (low pressure). All components scanned clean. All tool definitions operator-authored with no trust inversion. All external source restrictions enforced. This session passes clean audit.",
+    "auditTrailComplete": true,
+    "sessionAuditClean": true,
+    "auditCleanBlockers": [],
+    "templateOverheadTokens": 0
+  },
+  "schema": {
+    "cxbomVersion": "0.3.0",
+    "fieldGlossary": {
+      "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
+      "contextualSharePercent": "This component's token count as a percentage of total context tokens used.",
+      "sessionAuditClean": "True when zero open findings exist. This session is the 'clean bill of health' reference case, analogous to SBOM clean-bill-of-health for container deployment.",
+      "auditCleanBlockers": "Empty array indicates no findings blocking clean audit status.",
+      "overallRiskRating": "Aggregate risk rating. 'low' indicates all controls active, no findings, healthy Ring 0 share, and low context pressure."
+    }
+  },
+  "illustrative": true,
+  "catalogVersions": {
+    "owaspLlm": {
+      "version": "2026",
+      "url": "https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "a27034a5c2ebc53fe14a7394e984428944e40a5def3a18f64abf1deb4beffa33",
+      "commit": "d027bb64",
+      "ref": "2026-final"
+    },
+    "owaspAgentic": {
+      "version": "2026",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "d5a247ea0646193bc4e58810c9088d414a7d685b66e24f55f9b047a64acee467"
+    },
+    "cwe": {
+      "version": "CWE",
+      "url": "https://cwe.mitre.org/",
+      "released": true,
+      "releaseTag": "CWE (verified 2026-07-11)",
+      "contentHash": "97c45c50ef6602e71c7113bc0cb153d60ab2bfc1bee63e9a352d1dffb8a3fd67"
+    },
+    "atlas": {
+      "version": "ATLAS",
+      "url": "https://github.com/mitre-atlas/atlas-data",
+      "released": true,
+      "releaseTag": "MITRE ATLAS (verified 2026-07-11)",
+      "contentHash": "a9b3f97ca72f01bf5d1748ed20292e9bf5d4d12bea8777db98a0d2075f06e176"
+    },
+    "cyclonedx": {
+      "version": "1.6",
+      "url": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+    }
+  }
+}

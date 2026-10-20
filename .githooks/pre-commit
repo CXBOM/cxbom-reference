@@ -1,0 +1,5 @@
+#!/bin/sh
+# Anonymity guard. Owner: ATACE Working Group.
+# Blocks a commit whose identity is not the anonymous one, or whose staged content
+# carries a denylisted token. Enable once per clone: git config core.hooksPath .githooks
+exec python3 "$(git rev-parse --show-toplevel)/scripts/anon_check.py" staged

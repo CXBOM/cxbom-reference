@@ -1,0 +1,66 @@
+[
+  {
+    "commit": null,
+    "date": "2025-03-12",
+    "file": "owasp-llm-2025.json",
+    "license": "CC-BY-SA-4.0 (source doc; ids/titles recorded as factual reference data)",
+    "ref": null,
+    "releaseTag": "2025",
+    "released": true,
+    "retrieved": "2026-07-12",
+    "sha256": "6584bdb9334f05a420ee1e9e00f261d447ab972fbf33151694a4ba9a3448470e",
+    "url": "https://genai.owasp.org/llm-top-10/"
+  },
+  {
+    "commit": "d027bb64",
+    "date": "2026",
+    "file": "owasp-llm-2026.json",
+    "license": "CC-BY-SA-4.0 (source doc)",
+    "note": "Official 2026 release; rankings and content final and locked.",
+    "ref": "2026-final",
+    "releaseTag": "2026",
+    "released": true,
+    "retrieved": "2026-07-12",
+    "sha256": "a27034a5c2ebc53fe14a7394e984428944e40a5def3a18f64abf1deb4beffa33",
+    "url": "https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final"
+  },
+  {
+    "commit": null,
+    "date": "2025-12",
+    "file": "owasp-asi-2026.json",
+    "license": "CC-BY-SA-4.0 (source doc; attribution: OWASP Top 10 For Agentic Applications 2026)",
+    "note": "Released Version 2026. ASI01 released title 'Agent Goal Hijack' (draft used 'Agent Behaviour Hijack').",
+    "ref": null,
+    "releaseTag": "2026",
+    "released": true,
+    "retrieved": "2026-07-12",
+    "sha256": "d5a247ea0646193bc4e58810c9088d414a7d685b66e24f55f9b047a64acee467",
+    "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+  },
+  {
+    "commit": null,
+    "date": "2026-07-11",
+    "file": "cwe.json",
+    "license": "public reference data",
+    "ref": null,
+    "releaseTag": "CWE (verified 2026-07-11)",
+    "released": true,
+    "retrieved": "2026-07-13",
+    "sha256": "97c45c50ef6602e71c7113bc0cb153d60ab2bfc1bee63e9a352d1dffb8a3fd67",
+    "url": "https://cwe.mitre.org/",
+    "note": "Added CWE-1427/176/349/441 (MITRE-verified 2026-07-13 via cwe.mitre.org)."
+  },
+  {
+    "commit": null,
+    "date": "2026-07-11",
+    "file": "atlas.json",
+    "license": "public reference data",
+    "ref": null,
+    "releaseTag": "MITRE ATLAS (verified 2026-07-11)",
+    "released": true,
+    "retrieved": "2026-07-13",
+    "sha256": "a9b3f97ca72f01bf5d1748ed20292e9bf5d4d12bea8777db98a0d2075f06e176",
+    "url": "https://github.com/mitre-atlas/atlas-data",
+    "note": "Added AML.T0054 (LLM Jailbreak, MITRE-verified 2026-07-13 via atlas.mitre.org)."
+  }
+]

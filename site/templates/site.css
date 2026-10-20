@@ -1,0 +1,129 @@
+/* cxbom.org stylesheet: the manifest ledger. Owner: ATACE Working Group.
+   site/cxsite/palette.py parses the palette block below (build gate 5). Keep one
+   token per line in the form `--name: light-dark(#light, #dark);`. The viewer
+   repeats the same block, and tests/test_site_viewer.py keeps the two equal. */
+
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/source-serif-4-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("/fonts/source-serif-4-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("/fonts/source-serif-4-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/source-code-pro-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("/fonts/source-code-pro-latin-600-normal.woff2") format("woff2"); }
+
+:root {
+  color-scheme: light dark;
+  /* palette */
+  --bg: light-dark(#EEF0F3, #14171B);
+  --surface: light-dark(#FAFBFD, #1E2229);
+  --ink: light-dark(#16181C, #E7E9ED);
+  --muted: light-dark(#585E66, #AAB1BA);
+  --rule: light-dark(#7B818A, #7C838D);
+  --accent: light-dark(#BC1C1C, #F2564A);
+  --ring0: light-dark(#0A7A50, #28AC7F);
+  --ring1: light-dark(#0A5C9E, #3E90D2);
+  --ring2: light-dark(#B5440E, #DD7035);
+  --sevHigh: light-dark(#9E520C, #F0974A);
+  --sevMed: light-dark(#82600E, #E8C05C);
+  /* end palette */
+  --serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --mono: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
+}
+
+/* The theme switch is a checkbox and stores nothing. Checked means "the other
+   theme": dark on a light system, light on a dark system. */
+:root:has(#theme-flip:checked) { color-scheme: dark; }
+@media (prefers-color-scheme: dark) {
+  :root:has(#theme-flip:checked) { color-scheme: light; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); color: var(--ink); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--serif);
+  font-size: 1.0625rem; line-height: 1.6; overflow-wrap: break-word; }
+.frame { max-width: 56rem; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+main p, main li { max-width: 42rem; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.skip { position: absolute; left: 1rem; top: -4rem; z-index: 10; background: var(--surface);
+  color: var(--accent); padding: 0.5rem 0.75rem; border: 1px solid var(--rule); }
+.skip:focus { top: 1rem; }
+
+.masthead { border-bottom: 3px double var(--rule); padding-bottom: 0.75rem; margin-bottom: 2rem; }
+.mark { font-family: var(--mono); font-weight: 600; letter-spacing: 0.08em; margin: 0 0 0.5rem;
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.35rem 0.75rem; }
+.mark a { color: var(--ink); text-decoration: none; }
+.mark .ver { font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.repo { display: inline-flex; align-items: center; gap: 0.35rem; margin-left: auto;
+  font-size: 0.8125rem; font-weight: 600; letter-spacing: 0; }
+.repo svg { width: 1.05rem; height: 1.05rem; display: block; }
+.strip { display: block; width: 100%; height: 1.5rem; margin: 0.25rem 0; }
+.strip-note { font-family: var(--mono); font-size: 0.8125rem; color: var(--muted); margin: 0 0 0.75rem; }
+.masthead nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap;
+  gap: 0.25rem 1.25rem; font-family: var(--mono); font-size: 0.9375rem; }
+.masthead nav a[aria-current="page"] { color: var(--ink); text-decoration-style: double; }
+.theme { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.75rem;
+  font-family: var(--mono); font-size: 0.8125rem; color: var(--muted); }
+.theme input { accent-color: var(--accent); width: 1rem; height: 1rem; margin: 0; }
+
+h1, h2, h3 { line-height: 1.25; font-weight: 600; }
+h1 { font-size: 2rem; margin: 0 0 1rem; }
+.film { margin: 0 0 1.75rem; padding: 0.65rem; max-width: none;
+  background: var(--surface); border: 3px solid var(--accent); }
+.film video { display: block; width: 100%; height: auto; background: #14171B; }
+.film figcaption { font-family: var(--mono); font-size: 0.9375rem; line-height: 1.45;
+  margin: 0.75rem 0 0; max-width: none; color: var(--ink); }
+h2 { font-size: 1.375rem; margin: 2.5rem 0 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.125rem; margin: 2rem 0 0.5rem; }
+.numbered { counter-reset: section; }
+.numbered h2::before { counter-increment: section; content: "\00A7" counter(section) "\00A0\00A0";
+  font-family: var(--mono); font-weight: 400; color: var(--muted); }
+
+code, pre, kbd { font-family: var(--mono); font-size: 0.875em; }
+pre { background: var(--surface); border: 1px solid var(--rule); padding: 0.75rem 1rem;
+  overflow-x: auto; line-height: 1.45; }
+.table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: 0.9375rem; }
+caption { text-align: left; font-family: var(--mono); font-size: 0.8125rem; color: var(--muted);
+  padding: 0 0 0.4rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--mono); font-size: 0.8125rem;
+  font-weight: 600; letter-spacing: 0.04em; }
+tfoot th, tfoot td { border-top: 2px solid var(--ink); border-bottom: none; }
+.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.stamp { display: inline-block; font-family: var(--mono); font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.12em; color: var(--accent); border: 2px solid var(--accent);
+  padding: 0 0.4rem; transform: rotate(-2deg); white-space: nowrap; }
+.stamp.plain { color: var(--muted); border-color: var(--muted); transform: none; }
+.ring-label { font-family: var(--mono); font-size: 0.875rem; white-space: nowrap; }
+.t0 { color: var(--ring0); }
+.t1 { color: var(--ring1); }
+.t2 { color: var(--ring2); }
+.bar { display: block; width: 6rem; height: 0.5rem; margin-top: 0.3rem; }
+.bar .track { fill: var(--bg); stroke: var(--rule); stroke-width: 0.5; }
+.note { border-left: 3px solid var(--rule); padding-left: 0.75rem; color: var(--muted); }
+.privacy { background: var(--surface); border: 1px solid var(--rule); padding: 0.75rem 1rem; }
+
+/* Strip and ledger fills. Each ring also carries a pattern, so color never
+   carries the meaning alone. */
+.f0 { fill: var(--ring0); }
+.f1 { fill: var(--ring1); }
+.f2 { fill: var(--ring2); }
+.fo { fill: var(--rule); }
+.pat-line { stroke: var(--bg); stroke-width: 1.5; }
+.pat-dot { fill: var(--bg); }
+.strip .edge { fill: none; stroke: var(--ink); stroke-width: 1; }
+
+footer { margin-top: 4rem; border-top: 3px double var(--rule); padding-top: 1rem;
+  font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0.25rem 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

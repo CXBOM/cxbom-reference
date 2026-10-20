@@ -1,0 +1,364 @@
+{
+  "bomFormat": "CxBOM",
+  "specVersion": "0.2.0",
+  "illustrative": true,
+  "extends": {
+    "format": "CycloneDX",
+    "version": "1.6",
+    "schema": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+  },
+  "serialNumber": "urn:uuid:11111111-2222-4333-8444-555555555555",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-07-12T00:00:00Z",
+    "generatedBy": {
+      "name": "cxbom-emitter",
+      "version": "0.1.0",
+      "schema": "https://cxbom.org/schema/0.2.0/cxbom.schema.json"
+    },
+    "session": {
+      "id": "sess_minimal",
+      "model": {
+        "family": "olmo",
+        "version": "OLMo-2-0425-1B-Instruct",
+        "provider": "AllenAI",
+        "contextWindowMaxTokens": 200000,
+        "architectureType": "transformer-decoder",
+        "attentionMechanism": "scaled-dot-product",
+        "tokenDemocracyApplies": true
+      },
+      "contextWindowTokensUsed": 110,
+      "contextWindowUtilizationPercent": 0.06,
+      "turnCount": 1,
+      "startedAt": "2026-07-12T00:00:00Z",
+      "endedAt": "2026-07-12T00:00:01Z"
+    },
+    "agent": {
+      "id": "agent_min",
+      "name": "Minimal Agent",
+      "version": "1.0.0",
+      "operator": "ATACE Working Group",
+      "deploymentEnvironment": "testing",
+      "deploymentId": "deploy_min"
+    }
+  },
+  "trustModel": {
+    "description": "Three-ring pre-inference trust model. Token Democracy: ring labels confer no computational privilege.",
+    "rings": [
+      {
+        "ring": 0,
+        "designation": "operator",
+        "description": "Operator-authored.",
+        "controlLayer": "system-prompt",
+        "integrityRequirement": "cryptographic",
+        "allowedSources": [
+          "operator-vault"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 1,
+        "designation": "agent",
+        "description": "Agent-mediated.",
+        "controlLayer": "tool-execution",
+        "integrityRequirement": "hash-verified",
+        "allowedSources": [
+          "approved-mcp-servers"
+        ],
+        "externalSourcesPermitted": true
+      },
+      {
+        "ring": 2,
+        "designation": "user",
+        "description": "User input.",
+        "controlLayer": "ingress",
+        "integrityRequirement": "sanitized",
+        "allowedSources": [
+          "authenticated-user-session"
+        ],
+        "externalSourcesPermitted": false
+      }
+    ]
+  },
+  "contextComponents": [
+    {
+      "id": "cc-001",
+      "type": "system-prompt",
+      "subtype": "primary-operator-instruction",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "system-prompt",
+      "label": "Operator system prompt",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-vault",
+        "thirdParty": false,
+        "operatorControlled": true,
+        "serverChecksum": "19b2865008bb1b97f26ed4ee604e0412b911b2754d4c07f643f34e807d143b20"
+      },
+      "content": {
+        "sha256": "a7bef90495874ba76333357a7e4fb4115cdf70ab55b5a8fb2bacbe93aceaeb5d",
+        "tokenCount": 60,
+        "contextualSharePercent": 60.0,
+        "positionInContext": "prepended",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-financial-data"
+        ],
+        "deniedActions": [
+          "write-transactions"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-002",
+      "type": "tool-definition",
+      "subtype": "external-mcp-server",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "External MCP tool definition",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "external-mcp-server",
+        "thirdParty": true,
+        "operatorControlled": false,
+        "serverOperator": "External Provider Inc."
+      },
+      "content": {
+        "sha256": "1443d6633e1929f9366aee786eb37f9188c30cb8e22bf659fd48625711cf7070",
+        "tokenCount": 40,
+        "contextualSharePercent": 40.0,
+        "positionInContext": "tool-schema-block",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true
+      },
+      "sanitization": {
+        "status": "scanned-with-warnings",
+        "appliedControls": [
+          "injection-pattern-scan"
+        ],
+        "missingControls": [
+          "server-integrity-verification"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "market-data-read"
+        ],
+        "deniedActions": []
+      },
+      "toolDefinitionTrustInversion": {
+        "detected": true,
+        "severity": "high",
+        "description": "External MCP tool definition assembled with ring-0-equivalent positional authority.",
+        "positionalAuthority": "ring-0-equivalent",
+        "claimedAuthority": "ring-1",
+        "authorityMismatch": true,
+        "mitigationStatus": "none",
+        "mitigationRequired": [
+          "trust-tier-downgrade-label"
+        ]
+      },
+      "notCollected": [
+        "source.serverChecksumVerified"
+      ],
+      "auditFlags": [
+        "TRUST_INVERSION_DETECTED"
+      ],
+      "injectionRiskRating": "high",
+      "findingRefs": [
+        "finding-001"
+      ]
+    }
+  ],
+  "controlLayers": [
+    {
+      "layerId": "tool-execution",
+      "designation": "Tool Execution",
+      "description": "Real-system action boundary.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04"
+      ],
+      "agenticCoverage": [
+        "ASI02",
+        "ASI04"
+      ],
+      "controlsActive": [
+        "tool-output-injection-scan"
+      ],
+      "controlsInactive": [
+        "external-mcp-server-integrity-verification"
+      ],
+      "status": "partial",
+      "coverageGaps": [
+        "External MCP tool definitions admitted without integrity verification."
+      ],
+      "findingRefs": [
+        "finding-001"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding-001",
+      "title": "Tool Definition Trust Inversion",
+      "severity": "high",
+      "category": "trust-inversion",
+      "cweRef": "CWE-345",
+      "owaspRefs": [
+        "LLM01",
+        "LLM04"
+      ],
+      "agenticRefs": [
+        "ASI02",
+        "ASI04"
+      ],
+      "formalRef": "ATACE Finding 1: Tool Definition Trust Inversion",
+      "affectedComponents": [
+        "cc-002"
+      ],
+      "affectedLayers": [
+        "tool-execution"
+      ],
+      "description": "External MCP tool definition assembled with ring-0-equivalent positional authority.",
+      "evidence": {
+        "componentId": "cc-002",
+        "sourceUri": "mcp://external/tools"
+      },
+      "remediation": {
+        "immediate": [
+          "Apply trust-tier-downgrade label"
+        ],
+        "shortTerm": [
+          "Pin MCP server version"
+        ],
+        "strategic": [
+          "Enforce ring-1 classification for external MCP tool definitions"
+        ]
+      },
+      "status": "open",
+      "detectedAt": "2026-07-12T00:00:00Z"
+    }
+  ],
+  "sessionSummary": {
+    "totalContextTokens": 100,
+    "templateOverheadTokens": 10,
+    "componentBreakdown": {
+      "byTrustRing": {
+        "ring0": {
+          "tokens": 60,
+          "sharePercent": 60.0,
+          "components": [
+            "cc-001"
+          ]
+        },
+        "ring1": {
+          "tokens": 40,
+          "sharePercent": 40.0,
+          "components": [
+            "cc-002"
+          ]
+        },
+        "ring2": {
+          "tokens": 0,
+          "sharePercent": 0.0,
+          "components": []
+        }
+      },
+      "byType": {
+        "systemPrompt": {
+          "tokens": 60,
+          "sharePercent": 60.0
+        },
+        "toolDefinition": {
+          "tokens": 40,
+          "sharePercent": 40.0
+        }
+      }
+    },
+    "findingsSummary": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "low": 0,
+      "totalOpen": 1
+    },
+    "controlLayerStatus": {
+      "active": [],
+      "partial": [
+        "tool-execution"
+      ],
+      "inactive": []
+    },
+    "dualFailureMultiplierAssessment": {
+      "contextWindowUtilization": 0.06,
+      "qualityPressureRating": "low",
+      "attackSurfacePressureRating": "low",
+      "note": "Illustrative low-utilization session; ratings are operator-asserted."
+    },
+    "overallRiskRating": "high",
+    "riskRationale": "One high-severity open finding.",
+    "auditTrailComplete": true,
+    "sessionAuditClean": false,
+    "auditCleanBlockers": [
+      "finding-001"
+    ]
+  },
+  "schema": {
+    "cxbomVersion": "0.2.0",
+    "fieldGlossary": {
+      "trustRing": "Pre-inference classification only."
+    }
+  },
+  "catalogVersions": {
+    "owaspLlm": {
+      "version": "2026",
+      "url": "https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final",
+      "commit": "d027bb64",
+      "ref": "2026-final",
+      "path": "2026/final",
+      "releaseTag": "2026",
+      "released": true,
+      "contentHash": "a27034a5c2ebc53fe14a7394e984428944e40a5def3a18f64abf1deb4beffa33"
+    },
+    "owaspAgentic": {
+      "version": "2026",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "releaseTag": "2026",
+      "released": true,
+      "contentHash": "d5a247ea0646193bc4e58810c9088d414a7d685b66e24f55f9b047a64acee467"
+    },
+    "cwe": {
+      "version": "CWE",
+      "url": "https://cwe.mitre.org/",
+      "releaseTag": "cwe",
+      "released": true,
+      "contentHash": "97c45c50ef6602e71c7113bc0cb153d60ab2bfc1bee63e9a352d1dffb8a3fd67"
+    },
+    "atlas": {
+      "version": "ATLAS",
+      "url": "https://github.com/mitre-atlas/atlas-data",
+      "releaseTag": "atlas",
+      "released": true,
+      "contentHash": "a9b3f97ca72f01bf5d1748ed20292e9bf5d4d12bea8777db98a0d2075f06e176"
+    },
+    "cyclonedx": {
+      "version": "1.6",
+      "url": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+    }
+  }
+}

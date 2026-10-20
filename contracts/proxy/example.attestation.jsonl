@@ -1,0 +1,5 @@
+{"contract":{"name":"cxbom-attestation","version":"2.0.0"},"envelopeSha256":"840e5f91a4f084e527cc09663c72742e49b31ab18641323c0c5fde6628021657","keyFingerprint":"2d743540d87616d3103016caa1e1b340e3e8679bfb3558dec26fe0472248936f","kind":"session","launchSha256":"d9dbbbeb24a0ecc272ec7aeb8db06799cb00d5bab39a5db002ad579d58d9a76a","mode":"enforce","pid":4242,"proxySessionId":"3b0c8f0e-6c1c-4b8e-9d5e-2f7a1c9e0b11","serverId":"fetch","startedAt":"2026-10-10T18:05:00Z"}
+{"at":"2026-10-10T18:05:01Z","era":"legacy","kind":"protocol","protocolVersion":"2025-11-25","seq":1}
+{"at":"2026-10-10T18:05:01Z","instructionsSha256":"12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126","kind":"server","seq":2,"serverInfo":{"name":"mcp-fetch","version":"1.0.0"},"storeRef":null,"verdict":"pinned-match"}
+{"approvalMode":"interactive","approvedAt":"2026-10-10T18:00:00Z","approvedBy":"demo-operator","at":"2026-10-10T18:05:02Z","itemType":"tool","kind":"verdict","name":"fetch","seq":3,"sha256":"5aa12876892b083fa01a925df774c715b11a20a3c47164e14b6126e731460dd1","storeRef":null,"verdict":"pinned-match"}
+{"at":"2026-10-10T18:07:00Z","kind":"end","reason":"eof","seq":4}

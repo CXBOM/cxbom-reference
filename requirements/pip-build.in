@@ -1,0 +1,6 @@
+# pip for the wheel build (spec 12). Owner: ATACE Working Group.
+# scripts/build_wheel.py needs pip 24.0 or newer, so the build venv never runs
+# the 22.0.2 that requirements/pip.txt pins for the install proof.
+# Compile from the repository root, then commit both files:
+#   uv pip compile --universal --python-version 3.10 --generate-hashes requirements/pip-build.in -o requirements/pip-build.txt
+pip>=24,<27

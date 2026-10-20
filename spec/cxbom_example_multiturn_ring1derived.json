@@ -1,0 +1,667 @@
+{
+  "_comment": "CxBOM v0.3.0 — hand-authored illustrative multi-turn fixture (not emitter output). Exercises assembledAtTurn across turns and the ring-1-derived trust tier. Records pre-inference token composition only.",
+  "_ref": "ATACE Working Group, Section 6 draft. Extends CycloneDX 1.6. Third reference record: multi-turn agent session with a model-derived re-entrant component.",
+  "bomFormat": "CxBOM",
+  "specVersion": "0.3.0",
+  "extends": {
+    "format": "CycloneDX",
+    "version": "1.6",
+    "schema": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+  },
+  "serialNumber": "urn:uuid:c3d4e5f6-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-06-18T09:41:22Z",
+    "generatedBy": {
+      "name": "CxBOM Agent Audit Layer",
+      "version": "0.1.0",
+      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+    },
+    "session": {
+      "id": "sess_logistics_3c9a7e21b4d6",
+      "model": {
+        "family": "claude",
+        "version": "claude-sonnet-4-6",
+        "provider": "Anthropic",
+        "contextWindowMaxTokens": 200000,
+        "architectureType": "transformer-decoder"
+      },
+      "contextWindowTokensUsed": 168,
+      "contextWindowUtilizationPercent": 0.08,
+      "turnCount": 4,
+      "startedAt": "2026-06-18T09:38:00Z",
+      "endedAt": "2026-06-18T09:41:22Z"
+    },
+    "agent": {
+      "id": "agent_prod_logistics_planner",
+      "name": "Logistics Planning Assistant Agent",
+      "version": "3.4.1",
+      "operator": "Contoso Supply Chain Platform Team",
+      "deploymentEnvironment": "production",
+      "deploymentId": "deploy_contoso_logistics_prod_v3"
+    }
+  },
+  "trustModel": {
+    "description": "Three-ring trust tier model. Ring authority is a pre-inference classification only. No trust tier receives different treatment inside the model. Model-generated content that re-enters the context in a later turn is recorded as the ring-1-derived tier, inheriting Ring 1 provenance (trustRing 1).",
+    "rings": [
+      {
+        "ring": 0,
+        "designation": "operator",
+        "description": "Operator-authored content. Highest intended authority. Must originate from operator-controlled infrastructure and carry cryptographic integrity verification.",
+        "controlLayer": "system-prompt",
+        "integrityRequirement": "cryptographic",
+        "allowedSources": [
+          "operator-vault",
+          "internal-config-service"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 1,
+        "designation": "agent",
+        "description": "Agent-mediated content. Intermediate authority. Includes tool results, retrieved documents, and model-generated planning notes re-injected from agent memory (recorded at the tier level as ring-1-derived).",
+        "controlLayer": "tool-execution",
+        "integrityRequirement": "hash-verified",
+        "allowedSources": [
+          "approved-tool-servers",
+          "internal-rag",
+          "agent-memory-store"
+        ],
+        "externalSourcesPermitted": false
+      },
+      {
+        "ring": 2,
+        "designation": "user",
+        "description": "User-supplied conversational input. Lowest intended authority. Subject to full ingress sanitization pipeline.",
+        "controlLayer": "ingress",
+        "integrityRequirement": "sanitized",
+        "allowedSources": [
+          "authenticated-user-session"
+        ],
+        "externalSourcesPermitted": false
+      }
+    ]
+  },
+  "contextComponents": [
+    {
+      "id": "cc-001",
+      "type": "system-prompt",
+      "subtype": "primary-operator-instruction",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "system-prompt",
+      "label": "Primary operator system prompt — logistics planning assistant",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-vault",
+        "uri": "vault://contoso-ai/prompts/logistics-planner/v3.4.1",
+        "retrievedAt": "2026-06-18T09:38:00Z",
+        "authorizedBy": "operator-config-service",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "fa0e8ca071e525f5bb487c67b22de7913ff95ef5ff0b046581a6a923dc7310ec",
+        "tokenCount": 40,
+        "contextualSharePercent": 25.0,
+        "positionInContext": "prepended",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "control-character-strip",
+          "injection-pattern-scan"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-shipment-records",
+          "draft-routing-plans"
+        ],
+        "deniedActions": [
+          "dispatch-shipment",
+          "cancel-shipment",
+          "reroute-shipment"
+        ],
+        "overrideResistanceDeclared": true,
+        "confidentialityInstructionPresent": true,
+        "negativeCapabilityListPresent": true
+      },
+      "caching": {
+        "cached": true,
+        "cacheBreakpoint": "ring-0-invariant",
+        "cacheTtlSeconds": 300
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-002",
+      "type": "tool-definition",
+      "subtype": "internal-operator-authored",
+      "trustRing": 0,
+      "trustTier": "operator",
+      "controlLayer": "tool-execution",
+      "label": "Internal shipment-lookup tool — operator-authored definition (read-only)",
+      "assembledAtTurn": 0,
+      "source": {
+        "origin": "operator-config-service",
+        "uri": "config://contoso-ai/tools/shipment-lookup/v1.5.0",
+        "retrievedAt": "2026-06-18T09:38:01Z",
+        "authorizedBy": "operator-config-service",
+        "thirdParty": false,
+        "operatorControlled": true
+      },
+      "content": {
+        "sha256": "dd4476973ace3a3ee463499441355d10a65922a0892a8e54e6ae40887e372854",
+        "tokenCount": 24,
+        "contextualSharePercent": 15.0,
+        "positionInContext": "tool-schema-block",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "schema-validation",
+          "capability-permitlist-check",
+          "unicode-normalization"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "shipment-read"
+        ],
+        "deniedActions": [
+          "shipment-write",
+          "shipment-cancel",
+          "shipment-dispatch"
+        ],
+        "capabilityScope": "read-only",
+        "capabilityPermitListVerified": true
+      },
+      "toolDefinitionTrustInversion": {
+        "detected": false,
+        "reason": "Operator-controlled source. Ring 0 provenance. Capability permit list enforced."
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-003",
+      "type": "user-turn",
+      "subtype": "conversational-query",
+      "trustRing": 2,
+      "trustTier": "user",
+      "controlLayer": "ingress",
+      "label": "User query — turn 1: late shipments to the Denver hub",
+      "assembledAtTurn": 1,
+      "source": {
+        "origin": "authenticated-user-session",
+        "userIdHash": "sha256:4d2a9f18c7b3e60a1f5d8c9b2e4a7f30",
+        "sessionId": "sess_logistics_3c9a7e21b4d6",
+        "ipHash": "sha256:b8c1d4e7a2f09153",
+        "authenticatedAt": "2026-06-18T09:37:55Z",
+        "authMethod": "oauth2-pkce",
+        "thirdParty": false
+      },
+      "content": {
+        "sha256": "5c01bb36936def670e7172392fca7283e53482f83b85d4391a413852ba6ff1fa",
+        "tokenCount": 12,
+        "contextualSharePercent": 7.5,
+        "positionInContext": "user-turn-1",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip-plus-homoglyph-detect"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "homoglyph-detection",
+          "injection-pattern-scan",
+          "token-length-enforcement",
+          "rate-limit-check"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "query-agent"
+        ],
+        "deniedActions": [
+          "modify-system-prompt",
+          "invoke-tools-directly",
+          "override-ring-0"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-004",
+      "type": "tool-result",
+      "subtype": "internal-erp-query",
+      "trustRing": 1,
+      "trustTier": "agent",
+      "controlLayer": "tool-execution",
+      "label": "Shipment-lookup result — open shipments to the Denver hub (turn 2)",
+      "assembledAtTurn": 2,
+      "source": {
+        "origin": "internal-tool-server",
+        "toolId": "shipment-lookup",
+        "toolVersion": "1.5.0",
+        "invokedAt": "2026-06-18T09:39:31Z",
+        "thirdParty": false,
+        "sandboxed": true,
+        "executionEnvironment": "isolated-container",
+        "runtimeVersion": "v8-22.0"
+      },
+      "content": {
+        "sha256": "25e7ce5cbda0f1945be757dc1fbe918f9684c52787ed58c02b4f3e9d320917ca",
+        "tokenCount": 44,
+        "contextualSharePercent": 27.5,
+        "positionInContext": "tool-result-turn-2",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "dataClassification": "confidential-logistics",
+        "containsPII": false,
+        "containsCredentials": false,
+        "containsSecretsOrKeys": false
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "pii-detection",
+          "credential-pattern-scan",
+          "structured-output-schema-validation",
+          "trust-label-injection"
+        ],
+        "trustLabel": "<tool_data source=\"shipment-lookup\" trust=\"ring-1\" turn=\"2\">"
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "forward-to-user-unfiltered"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-005",
+      "type": "retrieved-document",
+      "subtype": "memory-injection",
+      "trustRing": 1,
+      "trustTier": "ring-1-derived",
+      "controlLayer": "tool-execution",
+      "label": "Model-authored routing plan re-injected from agent memory (turn 2 output, re-entrant at turn 3)",
+      "assembledAtTurn": 3,
+      "source": {
+        "origin": "model-generated",
+        "uri": "memory://contoso-ai/sessions/sess_logistics_3c9a7e21b4d6/plan-note-turn-2",
+        "retrievedAt": "2026-06-18T09:40:58Z",
+        "authorizedBy": "agent-orchestrator",
+        "thirdParty": false,
+        "operatorControlled": false
+      },
+      "content": {
+        "sha256": "ebe4adb47be9a92354e2f72b807b062398fbfd7568d6b38a2b4eb9dcd58ffb93",
+        "tokenCount": 30,
+        "contextualSharePercent": 18.75,
+        "positionInContext": "memory-injection-turn-3",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "dataClassification": "internal-planning-note"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "injection-pattern-scan",
+          "trust-label-injection",
+          "memory-provenance-tagging"
+        ],
+        "trustLabel": "<memory_note source=\"model-generated\" trust=\"ring-1-derived\" origin-turn=\"2\">"
+      },
+      "permissions": {
+        "permittedActions": [
+          "read-by-agent"
+        ],
+        "deniedActions": [
+          "interpret-as-instruction",
+          "override-ring-0",
+          "auto-dispatch-without-approval"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "low",
+      "findingRefs": []
+    },
+    {
+      "id": "cc-006",
+      "type": "user-turn",
+      "subtype": "conversational-query",
+      "trustRing": 2,
+      "trustTier": "user",
+      "controlLayer": "ingress",
+      "label": "User query — turn 3: approve consolidation plan preparation",
+      "assembledAtTurn": 3,
+      "source": {
+        "origin": "authenticated-user-session",
+        "userIdHash": "sha256:4d2a9f18c7b3e60a1f5d8c9b2e4a7f30",
+        "sessionId": "sess_logistics_3c9a7e21b4d6",
+        "ipHash": "sha256:b8c1d4e7a2f09153",
+        "authenticatedAt": "2026-06-18T09:37:55Z",
+        "authMethod": "oauth2-pkce",
+        "thirdParty": false
+      },
+      "content": {
+        "sha256": "512f4a53d9a8cdcd64e7cea7f2b01a2aa1a138c9be260a4fa8fb98eaca42839b",
+        "tokenCount": 10,
+        "contextualSharePercent": 6.25,
+        "positionInContext": "user-turn-3",
+        "encodingState": "utf-8-nfc",
+        "normalizationApplied": true,
+        "normalizationMethod": "unicode-nfc-plus-control-strip-plus-homoglyph-detect"
+      },
+      "sanitization": {
+        "status": "clean",
+        "appliedControls": [
+          "unicode-normalization",
+          "homoglyph-detection",
+          "injection-pattern-scan",
+          "token-length-enforcement",
+          "rate-limit-check"
+        ]
+      },
+      "permissions": {
+        "permittedActions": [
+          "query-agent"
+        ],
+        "deniedActions": [
+          "modify-system-prompt",
+          "invoke-tools-directly",
+          "override-ring-0"
+        ]
+      },
+      "auditFlags": [],
+      "injectionRiskRating": "none",
+      "findingRefs": []
+    }
+  ],
+  "controlLayers": [
+    {
+      "layerId": "ingress",
+      "designation": "Ingress",
+      "description": "Pre-model authentication, input validation, rate limiting, and content pre-classification.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM03"
+      ],
+      "controlsActive": [
+        "oauth2-pkce-authentication",
+        "token-length-cap",
+        "rate-limiter-per-user",
+        "rate-limiter-per-session",
+        "unicode-normalization",
+        "homoglyph-detector",
+        "injection-pre-classifier"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "system-prompt",
+      "designation": "System Prompt (Ring 0)",
+      "description": "Operator instruction governance, override-resistance declaration, trust boundary labeling.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM09"
+      ],
+      "controlsActive": [
+        "override-resistance-declaration",
+        "trust-boundary-xml-labeling",
+        "negative-capability-list",
+        "confidentiality-instruction",
+        "action-gate-declaration"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "reasoning",
+      "designation": "Agent Reasoning",
+      "description": "In-flight behavioral monitoring, scope enforcement, confidence gating, human-approval gating for irreversible actions.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM08"
+      ],
+      "controlsActive": [
+        "thought-chain-monitor",
+        "scope-creep-detector",
+        "confidence-gate",
+        "human-in-loop-checkpoint"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "tool-execution",
+      "designation": "Tool Execution",
+      "description": "Real-system action boundary. Shipment-lookup execution, output sanitization, memory-provenance tagging, and trust labeling of model-derived re-entrant content.",
+      "owaspCoverage": [
+        "LLM01",
+        "LLM04",
+        "LLM05",
+        "LLM06"
+      ],
+      "controlsActive": [
+        "server-side-input-validation",
+        "tool-output-injection-scan",
+        "tool-output-trust-label-injection",
+        "execution-sandboxing",
+        "internal-tool-allowlist",
+        "memory-provenance-tagging",
+        "capability-permitlist-enforcement"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": [],
+      "agenticCoverage": [
+        "ASI02",
+        "ASI04"
+      ]
+    },
+    {
+      "layerId": "egress",
+      "designation": "Output / Egress",
+      "description": "Post-inference content control, PII and credential scrubbing, schema enforcement, attribution logging.",
+      "owaspCoverage": [
+        "LLM02",
+        "LLM06",
+        "LLM08"
+      ],
+      "controlsActive": [
+        "pii-scrubber",
+        "credential-scrubber",
+        "output-content-classifier",
+        "schema-validator",
+        "response-attribution-logger"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    },
+    {
+      "layerId": "infrastructure",
+      "designation": "Infrastructure",
+      "description": "Observability fabric, immutable audit logging, model version pinning, secret management, network segmentation, agent-memory access control.",
+      "owaspCoverage": [
+        "LLM03",
+        "LLM05",
+        "LLM07",
+        "LLM10"
+      ],
+      "controlsActive": [
+        "immutable-audit-log-siem-forwarding",
+        "anomaly-detector-token-usage",
+        "anomaly-detector-tool-call-frequency",
+        "model-version-pin-ci",
+        "system-prompt-vcs-signed-commits",
+        "network-egress-allowlist",
+        "vault-secret-management",
+        "secret-rotation-scheduled",
+        "agent-memory-tenant-namespace",
+        "agent-memory-auth-per-read",
+        "token-budget-enforcement-gateway"
+      ],
+      "controlsInactive": [],
+      "status": "active",
+      "coverageGaps": []
+    }
+  ],
+  "findings": [],
+  "sessionSummary": {
+    "totalContextTokens": 160,
+    "componentBreakdown": {
+      "byTrustRing": {
+        "ring0": {
+          "tokens": 64,
+          "sharePercent": 40.0,
+          "components": [
+            "cc-001",
+            "cc-002"
+          ]
+        },
+        "ring1": {
+          "tokens": 74,
+          "sharePercent": 46.25,
+          "components": [
+            "cc-004",
+            "cc-005"
+          ]
+        },
+        "ring2": {
+          "tokens": 22,
+          "sharePercent": 13.75,
+          "components": [
+            "cc-003",
+            "cc-006"
+          ]
+        }
+      },
+      "byType": {
+        "systemPrompt": {
+          "tokens": 40,
+          "sharePercent": 25.0
+        },
+        "toolDefinition": {
+          "tokens": 24,
+          "sharePercent": 15.0
+        },
+        "userTurn": {
+          "tokens": 22,
+          "sharePercent": 13.75
+        },
+        "toolResult": {
+          "tokens": 44,
+          "sharePercent": 27.5
+        },
+        "retrievedDocument": {
+          "tokens": 30,
+          "sharePercent": 18.75,
+          "note": "Model-generated planning note re-injected from agent memory; recorded at the tier level as ring-1-derived."
+        }
+      }
+    },
+    "findingsSummary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "totalOpen": 0
+    },
+    "controlLayerStatus": {
+      "active": [
+        "ingress",
+        "system-prompt",
+        "reasoning",
+        "tool-execution",
+        "egress",
+        "infrastructure"
+      ],
+      "partial": [],
+      "inactive": []
+    },
+    "overallRiskRating": "low",
+    "riskRationale": "Zero open findings. All six control layers fully active. The model-derived re-entrant planning note (cc-005) is tagged ring-1-derived and denied auto-dispatch without human approval. This session passes clean audit.",
+    "auditTrailComplete": true,
+    "sessionAuditClean": true,
+    "auditCleanBlockers": [],
+    "templateOverheadTokens": 8
+  },
+  "schema": {
+    "cxbomVersion": "0.3.0",
+    "fieldGlossary": {
+      "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
+      "trustTier": "Named trust tier. ring-1-derived marks model-generated content (an assistant turn re-entering the context) that inherits Ring 1 provenance (trustRing 1).",
+      "assembledAtTurn": "Conversational turn at which the component was assembled into the context. Distinct values across components record the pre-inference composition of a multi-turn session; this is a static inventory field and encodes no model-weighting or per-turn share dynamics.",
+      "contextualSharePercent": "This component's token count as a percentage of total context tokens used. A pre-inference composition statistic only."
+    }
+  },
+  "illustrative": true,
+  "catalogVersions": {
+    "owaspLlm": {
+      "version": "2026",
+      "url": "https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/tree/main/2026/final",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "a27034a5c2ebc53fe14a7394e984428944e40a5def3a18f64abf1deb4beffa33",
+      "commit": "d027bb64",
+      "ref": "2026-final"
+    },
+    "owaspAgentic": {
+      "version": "2026",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "released": true,
+      "releaseTag": "2026",
+      "contentHash": "d5a247ea0646193bc4e58810c9088d414a7d685b66e24f55f9b047a64acee467"
+    },
+    "cwe": {
+      "version": "CWE",
+      "url": "https://cwe.mitre.org/",
+      "released": true,
+      "releaseTag": "CWE (verified 2026-07-11)",
+      "contentHash": "97c45c50ef6602e71c7113bc0cb153d60ab2bfc1bee63e9a352d1dffb8a3fd67"
+    },
+    "atlas": {
+      "version": "ATLAS",
+      "url": "https://github.com/mitre-atlas/atlas-data",
+      "released": true,
+      "releaseTag": "MITRE ATLAS (verified 2026-07-11)",
+      "contentHash": "a9b3f97ca72f01bf5d1748ed20292e9bf5d4d12bea8777db98a0d2075f06e176"
+    },
+    "cyclonedx": {
+      "version": "1.6",
+      "url": "https://cyclonedx.org/schema/bom-1.6.schema.json"
+    }
+  }
+}

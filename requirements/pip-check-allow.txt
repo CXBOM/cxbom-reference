@@ -1,0 +1,4 @@
+# pip check lines scripts/verify_env.py accepts, only in an emit install (spec 12).
+# Owner: ATACE Working Group. tokenizers installs with --no-deps and without
+# huggingface-hub on purpose. tests/test_requirements.py ties the version to emit.txt.
+tokenizers 0.23.2 requires huggingface-hub, which is not installed.

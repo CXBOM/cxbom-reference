@@ -1,0 +1,51 @@
+# Anonymity denylist. Never committed; the hooks and CI fail closed without it.
+.anon-tokens
+
+.DS_Store
+__pycache__/
+.pytest_cache/
+.venv/
+
+# Model weights and caches on the Jetson stay local.
+lab/.cache/
+*.safetensors
+*.gguf
+
+# Demo production assets (narration audio, raw captures, rendered cuts) stay
+# local until the review decision.
+demo/production/
+
+# The recording machine's venv, and media as a second guard behind demo/config.py.
+.venv-record/
+*.webm
+*.mp4
+# The homepage film. Review decision 2026-10-17: this one cut is in the repo.
+!site/video/keeper.mp4
+*.mov
+*.wav
+*.cast
+
+# Wheel builds and install wheelhouses stay local (scripts/build_wheel.py, scripts/install_cxbom.py).
+/dist/
+/wheelhouse/
+
+# One recording session's J2 canary (demo/j2/script.py session_canary). Never committed.
+/.j2-session/
+
+# SDD scratch (briefs/reports written to worktree roots; never commit)
+.sdd-*
+
+# Site build output. Rebuilt by `python site/build.py`, never committed.
+site/dist/
+site/.dist-*/
+
+# A lock run killed outright leaves one temp file beside the schema lock. The
+# next lock run reaps it; this keeps a stray one out of a commit meanwhile.
+spec/published.lock.json.*.tmp
+
+# Site CI tools and local preview state.
+site/node_modules/
+site/.wrangler/
+
+# Reproducible wheel output
+dist/

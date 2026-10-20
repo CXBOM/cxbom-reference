@@ -1,0 +1,8 @@
+# cxbom core runtime lock input (spec 3). Owner: ATACE Working Group.
+# Ranges match pyproject.toml. Compile from the repository root, then commit both files:
+#   uv pip compile --universal --python-version 3.10 --generate-hashes requirements/core.in -o requirements/core.txt
+# Install with: pip install --no-deps --require-hashes --only-binary :all: -r requirements/core.txt, then pip check.
+rfc8785>=0.1.4,<0.2
+jsonschema[format-nongpl]>=4.23,<5
+rfc3339-validator
+cryptography>=42,<51

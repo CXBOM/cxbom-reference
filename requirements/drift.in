@@ -1,0 +1,5 @@
+# uv for the scheduled lock drift check (.github/workflows/lock-drift.yml). Owner: ATACE Working Group.
+# The same uv version that compiled the committed locks, so a regeneration is comparable.
+# Compile from the repository root, then commit both files:
+#   uv pip compile --universal --python-version 3.10 --generate-hashes requirements/drift.in -o requirements/drift.txt
+uv==0.8.14

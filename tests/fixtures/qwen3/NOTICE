@@ -1,0 +1,4 @@
+Qwen3-8B tokenizer files (tokenizer.json as tokenizer.json.xz, tokenizer_config.json).
+Copyright 2024 Alibaba Cloud. Licensed under Apache-2.0. Source repo Qwen/Qwen3-8B commit b968826d9c46dd6066d109eabc6255188de91218.
+Only tokenizer files are vendored. No model weights. tokenizer.json is xz-compressed and its
+decompressed bytes must match sha256 aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4.

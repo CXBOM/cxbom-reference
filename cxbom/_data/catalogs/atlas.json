@@ -1,0 +1,6 @@
+{
+  "AML.T0051": "LLM Prompt Injection",
+  "AML.T0051.000": "Direct",
+  "AML.T0051.001": "Indirect",
+  "AML.T0054": "LLM Jailbreak"
+}

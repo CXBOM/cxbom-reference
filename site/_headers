@@ -1,0 +1,20 @@
+# Cloudflare Pages response headers for cxbom.org. Owner: ATACE Working Group.
+# The build copies this file into dist/. site/cxsite/live_check.py reads the
+# same file and checks that a deployment serves exactly these headers.
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# The viewer is one self-contained file with inline script and style, so the demo
+# can open it offline. Only this path gets 'unsafe-inline'.
+/viewer/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+
+# Validators resolve the $id directly, from any origin.
+/schema/*
+  Content-Type: application/schema+json
+  Access-Control-Allow-Origin: *
