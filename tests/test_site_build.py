@@ -49,14 +49,29 @@ def test_the_film_figcaption_is_the_supported_sentence():
     match = re.search(r"<figcaption>(.*?)</figcaption>", html)
     assert match, "the homepage film has no figcaption"
     assert match.group(1) == (
-        "On this recording, for three attacks, a notes tool description that "
+        "On these recorded takes, for three attacks, a notes tool description that "
         "changed after it was signed sent the secret when the gate was off and "
         "the inbox showed that it arrived, and when the gate was on that tool "
         "was dropped from the listing, the secret did not arrive, and the model "
-        "kept calling fetch until it hit its limit, and only on the third attack "
+        "kept calling fetch until the take hit its limit, and only on the third attack "
         "was that definition clean on the first listing and changed on a "
         "re-listing within the session."
     )
+
+
+def test_every_page_names_the_reference_schemas_spec_version(built: Path):
+    # The header label once read "specification 0.2.0" after the schema moved to
+    # 0.3.0, because it was typed into the template. It now comes from the
+    # reference schema's own specVersion, so the two cannot disagree.
+    schema = json.loads((ROOT / "spec" / build.REFERENCE_SCHEMA).read_text(encoding="utf-8"))
+    version = schema["properties"]["specVersion"]["const"]
+    # The viewer is a standalone page the build copies whole; it carries no label.
+    pages = [p for p in sorted(built.rglob("*.html")) if p.relative_to(built).as_posix() != "viewer/index.html"]
+    assert len(pages) >= 7, [p.name for p in pages]
+    for page in pages:
+        text = page.read_text(encoding="utf-8")
+        assert f'<span class="ver">specification {version}</span>' in text, page.name
+        assert text.count('<span class="ver">') == 1, page.name
 
 
 def test_site_map_is_exact(built: Path):

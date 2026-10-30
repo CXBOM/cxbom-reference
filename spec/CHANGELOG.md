@@ -2,6 +2,17 @@
 
 Owner: ATACE Working Group.
 
+## Documentation correction (2026-10-30)
+
+- Correct how `SPEC.md`, `README.md`, and the site describe the relationship
+  to CycloneDX. CxBOM is a profile modeled on CycloneDX 1.6, not a CycloneDX
+  document. A record has no CycloneDX component list or dependency graph, and
+  a stock CycloneDX validator does not accept it unchanged. Earlier text
+  described CxBOM as an extension of CycloneDX that reused its component,
+  dependency, and metadata structures. That description was wrong.
+- Schema files, schema hashes, and validator behavior are unchanged. The
+  `v0.3.0` tag of the public reference repository keeps the earlier text.
+
 ## 0.3.0 (2026-10-18) — BREAKING
 
 - Remove the model-level `attentionMechanism` and `tokenDemocracyApplies`

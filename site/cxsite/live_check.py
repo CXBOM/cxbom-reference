@@ -65,6 +65,9 @@ MISSING_PATHS = (MISSING_PATH, "/viewer" + MISSING_PATH)
 # Pages consumes it. Asked for by name so that a deployment publishing the
 # site's own header policy is noticed.
 HEADERS_PATH = "/_headers"
+# Pages runs _worker.js (the film's range handler) as a Worker instead of serving it,
+# so like _headers it is a build file no served path reaches, and it must answer 404.
+WORKER_PATH = "/_worker.js"
 TIMEOUT_S = 20
 REDIRECT_STATUSES = frozenset({301, 302, 303, 307, 308})
 # Response header names a faithful Pages response may carry. A name that is not
@@ -270,9 +273,10 @@ def url_paths(dist: Path) -> list[tuple[str, Path]]:
             # all three, so skipping on a false answer would drop the entry from
             # the comparison silently. The build writes regular files only.
             raise LiveCheckError(f"{rel}: not a regular file; {dist} is not a site build")
-        if rel in ("_headers", "404.html"):
-            # Pages consumes _headers rather than serving it, and reaches 404.html
-            # only through a missing path, which check_live requests by name.
+        if rel in ("_headers", "_worker.js", "404.html"):
+            # Pages consumes _headers and _worker.js rather than serving them, and
+            # reaches 404.html only through a missing path, which check_live
+            # requests by name.
             continue
         if rel == "index.html":
             path = "/"
@@ -314,7 +318,7 @@ def check_live(base: str, dist: Path, get: Callable[[str], Response] = fetch) ->
     # goes vacuous. Every path this run will request is checked instead, and
     # because that reads local files only, it happens before the first request.
     wants = {path: expected_headers(rules, path)
-             for path in [p for p, _ in pairs] + list(MISSING_PATHS) + [HEADERS_PATH]}
+             for path in [p for p, _ in pairs] + list(MISSING_PATHS) + [HEADERS_PATH, WORKER_PATH]}
     for path, want in wants.items():
         for name in CHECKED_HEADERS:
             if name not in want:
@@ -401,17 +405,20 @@ def check_live(base: str, dist: Path, get: Callable[[str], Response] = fetch) ->
             errs.append(f"{path}: served bytes differ from the build")
         compare_headers(path, r)
 
-    r = get(base.rstrip("/") + HEADERS_PATH)
-    if not unusable(HEADERS_PATH, r):
-        common(HEADERS_PATH, r)
-        redirects(HEADERS_PATH, r)
+    consumed = [HEADERS_PATH] + ([WORKER_PATH] if (dist / WORKER_PATH.lstrip("/")).is_file() else [])
+    for consumed_path in consumed:
+        r = get(base.rstrip("/") + consumed_path)
+        if unusable(consumed_path, r):
+            continue
+        common(consumed_path, r)
+        redirects(consumed_path, r)
         if r.status != 404:
             # A 200 here means the deployment is serving the site's own header
             # policy as a document. The body is not compared against 404.html:
             # whether Pages answers a file it consumes with the custom not-found
             # page is not documented, and requiring it would turn this into a
             # gate that fires on a faithful deployment.
-            errs.append(f"{HEADERS_PATH}: status {r.status}, expected 404")
+            errs.append(f"{consumed_path}: status {r.status}, expected 404")
     return errs
 
 

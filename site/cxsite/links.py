@@ -33,6 +33,11 @@ STANDARDS_HOSTS = frozenset({
     "github.com"})
 SITE_HOST = urlsplit(SITE_ORIGIN).hostname
 ALLOWED_HOSTS = STANDARDS_HOSTS | {SITE_HOST}
+# github.com is on the host list only for the public reference repository, which
+# carries the CxBOM commit identity and names no author. The link gate refuses every
+# other path on that host, so another account or repository cannot ride the host entry.
+REFERENCE_REPO_HOST = "github.com"
+REFERENCE_REPO_PATH = "/CXBOM/cxbom-reference"
 # The one address the site publishes, matched whole. A different address, or the
 # same address carrying a query, is not this one and is refused.
 ALLOWED_MAILTO = frozenset({"mailto:spec@cxbom.org"})

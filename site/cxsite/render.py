@@ -102,12 +102,13 @@ def nav_html(current: str) -> str:
     return "\n".join(items)
 
 
-def render_page(template: str, page: Page, strip: str, strip_note: str) -> str:
+def render_page(template: str, page: Page, strip: str, strip_note: str, *, spec_version: str) -> str:
     if page.body.count("<h1") != 1:
         raise RenderError(f"{page.path}: a page needs exactly one h1")
     title = "CxBOM" if page.path == "/" else f"{page.title} | CxBOM"
     return string.Template(template).substitute(
         title=html.escape(title),
+        spec_version=html.escape(spec_version),
         strip=strip,
         strip_note=strip_note,
         nav=nav_html(page.path),

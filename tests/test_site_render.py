@@ -41,7 +41,7 @@ def test_aligned_table_is_refused_because_it_renders_inline_style():
 
 def test_page_has_landmarks_skip_link_lang_and_current_nav():
     page = render.Page(path="/spec/", title="Specification", body="<h1>Specification</h1>", numbered=True)
-    out = render.render_page(TEMPLATE, page, strip="<svg></svg>", strip_note="<p>n</p>")
+    out = render.render_page(TEMPLATE, page, strip="<svg></svg>", strip_note="<p>n</p>", spec_version="0.3.0")
     assert '<html lang="en">' in out
     assert '<a class="skip" href="#main">' in out
     for tag in ("<header", "<nav", '<main id="main" class="numbered">', "<footer"):
@@ -54,16 +54,16 @@ def test_page_has_landmarks_skip_link_lang_and_current_nav():
 
 def test_page_without_exactly_one_h1_is_refused():
     with pytest.raises(render.RenderError, match="exactly one h1"):
-        render.render_page(TEMPLATE, render.Page(path="/x/", title="X", body="<h2>X</h2>"), "", "")
+        render.render_page(TEMPLATE, render.Page(path="/x/", title="X", body="<h2>X</h2>"), "", "", spec_version="0.3.0")
     with pytest.raises(render.RenderError, match="exactly one h1"):
-        render.render_page(TEMPLATE, render.Page(path="/x/", title="X", body="<h1>a</h1><h1>b</h1>"), "", "")
+        render.render_page(TEMPLATE, render.Page(path="/x/", title="X", body="<h1>a</h1><h1>b</h1>"), "", "", spec_version="0.3.0")
 
 
 def test_template_loads_nothing_from_another_origin():
     # The template links to the project's own repository in the header. That is
     # a navigation link, not a loaded resource, so it is removed before the
     # origin check; a stylesheet, script, image or font URL would still fail.
-    template = TEMPLATE.replace('href="https://github.com/CXBOM/cxbom"', "")
+    template = TEMPLATE.replace('href="https://github.com/CXBOM/cxbom-reference"', "")
     assert "http://" not in template and "https://" not in template
     assert "<script" not in TEMPLATE and "style=" not in TEMPLATE
 

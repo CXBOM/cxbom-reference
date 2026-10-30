@@ -139,6 +139,11 @@ STANDALONE_PATTERNS = [
 # scoped to SPEC. Named as a subset of the list, and asserted to be one, so
 # the two cannot drift apart.
 IDENTIFYING_SERVICE_PATTERNS = (r"arxiv", r"github")
+# The one permitted exception: the public reference repository, which carries only
+# the CxBOM commit identity and names no author. It is removed whole before the scan,
+# so any other GitHub reference, including another path under the same organization,
+# still fails.
+REFERENCE_REPO = "https://github.com/CXBOM/cxbom-reference"
 
 
 @pytest.mark.parametrize("pattern", STANDALONE_PATTERNS)
@@ -150,6 +155,7 @@ def test_spec_reads_as_a_standalone_specification(pattern):
 @pytest.mark.parametrize("pattern", IDENTIFYING_SERVICE_PATTERNS)
 def test_no_document_names_an_identifying_service(pattern, name, text):
     assert pattern in STANDALONE_PATTERNS, f"{pattern} left STANDALONE_PATTERNS"
+    text = re.sub(re.escape(REFERENCE_REPO) + r"(?![\w./-])", "", text)
     assert not re.search(pattern, text, re.I), f"{name}: {pattern}"
 
 

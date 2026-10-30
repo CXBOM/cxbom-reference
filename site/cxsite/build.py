@@ -162,10 +162,10 @@ def _film_html() -> str:
         '<source src="/video/keeper.mp4" type="video/mp4">'
         '<track kind="captions" src="/video/keeper.vtt" srclang="en" label="English" default>'
         "</video>"
-        "<figcaption>On this recording, for three attacks, a notes tool description that changed after "
+        "<figcaption>On these recorded takes, for three attacks, a notes tool description that changed after "
         "it was signed sent the secret when the gate was off and the inbox showed that it arrived, and "
         "when the gate was on that tool was dropped from the listing, the secret did not arrive, and the "
-        "model kept calling fetch until it hit its limit, and only on the third attack was that definition "
+        "model kept calling fetch until the take hit its limit, and only on the third attack was that definition "
         "clean on the first listing and changed on a re-listing within the session.</figcaption>"
         "</figure>"
     )
@@ -204,6 +204,9 @@ def build(root: Path, out: Path) -> list[str]:
     lock = load_lock(root)
     record = json.loads(_read(root / "site" / "data" / "session_reference.json"))
     template = _read(root / "site" / "templates" / "page.html")
+    # The header's version label comes from the reference schema itself, so it cannot
+    # name a version the site no longer serves as current.
+    spec_version = json.loads(_read(root / "spec" / REFERENCE_SCHEMA))["properties"]["specVersion"]["const"]
     strip_html = strip.strip_svg(record, "strip")
     note_html = strip.strip_note(record)
 
@@ -213,7 +216,7 @@ def build(root: Path, out: Path) -> list[str]:
     written: list[str] = []
     try:
         def page(rel: str, p: render.Page) -> None:
-            written.append(_write(tmp, rel, render.render_page(template, p, strip_html, note_html)))
+            written.append(_write(tmp, rel, render.render_page(template, p, strip_html, note_html, spec_version=spec_version)))
 
         landing = render.md_to_html(_read(root / "site" / "content" / "landing.md"))
         landing = landing.replace("</h1>", "</h1>\n" + _film_html(), 1) + strip.ledger_table(record)

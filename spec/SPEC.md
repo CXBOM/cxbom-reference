@@ -35,10 +35,13 @@ link the records.
 
 ## Relationship to other bills of materials
 
-CxBOM extends CycloneDX 1.6 instead of replacing it. A context record is a
-sibling of the software and AI/ML bills of materials. Version 0.3.0 reuses the
-CycloneDX component, dependency, and metadata structures, and adds an overlay
-for context assembly.
+CxBOM is a profile modeled on CycloneDX 1.6, not a CycloneDX document. A record
+names CycloneDX 1.6 as its parent specification, follows its document envelope
+(format, specification version, serial number, version and metadata), and adds
+an overlay for context assembly. It has no CycloneDX component list or dependency
+graph, and it carries its own `bomFormat` value, "CxBOM", so a stock CycloneDX
+validator does not accept it unchanged. A context record is a sibling of the
+software and AI/ML bills of materials.
 
 Three kinds of record describe an AI system on different lifecycle axes:
 

@@ -75,10 +75,16 @@ ANON_SCRIPT = ROOT / "scripts" / "anon_check.py"
 # is slow but bounded. The cap exists so a hung checker fails the gate instead
 # of hanging the build. Measured, run_all over this build is 0.89 s and the scan
 # is the bulk of it. The homepage film is a published binary the scan must
-# read, and that read takes about a minute, so the cap is the test's 120 s
-# ceiling rather than the old 60 s. The old 600 s meant a hung checker stalled a build for ten
+# read, and that read takes about a minute on a laptop, so the base cap is 120 s
+# rather than the old 60 s, and the site scan adds ANON_SECONDS_PER_MB below. The old 600 s meant a hung checker stalled a build for ten
 # minutes before the gate refused, which is a worse failure than refusing early.
 ANON_TIMEOUT = 120
+# The scan reads every published byte through every decoding view, so its run time
+# grows with what the site publishes: the film costs about 4 s per megabyte on a
+# laptop and about twice that on a CI runner. The real site scan therefore gets the
+# base cap plus this many seconds per published megabyte, which is still a bound a
+# hung checker hits, rather than a fixed cap a correct scan of a larger site misses.
+ANON_SECONDS_PER_MB = 15
 # The probe only imports the checker and calls one helper, so it needs far less
 # headroom than a scan.
 ANON_PROBE_TIMEOUT = 30
@@ -423,6 +429,11 @@ def check_link(dist: Path, ids: set[str], url: str) -> str | None:
         return f"{url} is not an https link"
     if parts.hostname.lower() == links.SITE_HOST:
         return _check_internal(dist, ids, _same_origin_ref(parts))
+    if parts.hostname.lower() == links.REFERENCE_REPO_HOST:
+        path = parts.path.rstrip("/")
+        if parts.query or not (path == links.REFERENCE_REPO_PATH
+                               or path.startswith(links.REFERENCE_REPO_PATH + "/")):
+            return f"{url} is on {links.REFERENCE_REPO_HOST} but is not the reference repository"
     return None
 
 
@@ -557,6 +568,13 @@ def check_freeze(dist: Path, lock: dict) -> list[str]:
     for name, entry in entries:
         if not isinstance(entry, dict):
             errs.append(f"freeze: {name}: lock entry is not an object")
+            continue
+        # A local entry is a site artifact with no frozen URL, which the build's
+        # served-artifact loop skips too. One that also names a URL is ambiguous, and
+        # skipping it would let "local" carry a published file past the freeze.
+        if entry.get("local"):
+            if "servedAt" in entry:
+                errs.append(f"freeze: {name}: a local entry cannot also claim servedAt")
             continue
         served = entry.get("servedAt")
         if not isinstance(served, str) or not served.startswith(SITE_ORIGIN + "/"):
@@ -762,15 +780,25 @@ def check_anonymity(dist: Path, tokens: list[str], denylist_root: Path | None = 
         return _run_anon_site(dist, root)
 
 
+def site_scan_timeout(dist: Path) -> int:
+    """The cap for one site scan: the base, plus a fixed rate per whole published megabyte."""
+    size = sum(f.stat().st_size for f in dist.rglob("*") if f.is_file() and not f.is_symlink())
+    return ANON_TIMEOUT + ANON_SECONDS_PER_MB * (size // 2**20)
+
+
 def _run_anon_site(dist: Path, cwd: Path) -> list[str]:
     what = f"{ANON_SCRIPT.name} site"
     try:
+        timeout = site_scan_timeout(dist)
+    except OSError as e:
+        return [f"anonymity: the build could not be measured ({e.strerror}); refusing to certify anonymity"]
+    try:
         done = subprocess.run([sys.executable, str(ANON_SCRIPT), "site", str(dist)],
-                              cwd=cwd, capture_output=True, text=True, timeout=ANON_TIMEOUT)
+                              cwd=cwd, capture_output=True, text=True, timeout=timeout)
     except OSError as e:
         return [f"anonymity: {what} could not be run ({e.strerror}); refusing to certify anonymity"]
     except subprocess.TimeoutExpired:
-        return [f"anonymity: {what} did not finish within {ANON_TIMEOUT}s; "
+        return [f"anonymity: {what} did not finish within {timeout}s; "
                 f"refusing to certify anonymity"]
     if done.returncode == 0:
         return []

@@ -60,7 +60,8 @@ def _serve(dist: Path, faults: set[str]):
             path = self.path
             rel = path.lstrip("/") + ("index.html" if path.endswith("/") else "")
             f = dist / rel
-            served = f.is_file() and (rel != "_headers" or "serve-headers" in faults)
+            served = f.is_file() and ((rel != "_headers" or "serve-headers" in faults)
+                                      and (rel != "_worker.js" or "serve-worker" in faults))
             status = 200 if served else 404
             body = f.read_bytes() if status == 200 else (dist / "404.html").read_bytes()
             if "slow" in faults:
@@ -358,7 +359,7 @@ def test_a_problem_response_is_reported_before_anything_is_compared(dist):
     errs = live_check.check_live("https://example.invalid", dist, get=lambda url: r)
     assert errs
     probed = [p for p, _ in live_check.url_paths(dist)] + list(live_check.MISSING_PATHS) + [
-        live_check.HEADERS_PATH]
+        live_check.HEADERS_PATH] + ([live_check.WORKER_PATH] if (dist / "_worker.js").is_file() else [])
     assert set(errs) == {f"{p}: SSLCertVerificationError: hostname mismatch" for p in probed}
 
 
@@ -407,6 +408,18 @@ def test_the_headers_file_itself_must_not_be_served(server, dist):
     faults.add("serve-headers")
     errs = live_check.check_live(base, dist)
     assert f"{live_check.HEADERS_PATH}: status 200, expected 404" in errs, errs
+
+
+def test_the_worker_script_is_not_a_page_and_must_not_be_served(server, dist):
+    # Pages runs _worker.js (the film's range handler) as a Worker and never serves
+    # it, so a faithful deployment answers it 404. That is not a missing page, and a
+    # deployment that did serve it would be publishing the worker's source.
+    (dist / "_worker.js").write_text("export default {};\n", encoding="utf-8")
+    base, faults = server
+    assert live_check.check_live(base, dist) == []
+    faults.add("serve-worker")
+    errs = live_check.check_live(base, dist)
+    assert f"{live_check.WORKER_PATH}: status 200, expected 404" in errs, errs
 
 
 # ---------------------------------------------------------------------------
@@ -688,9 +701,10 @@ def test_url_paths_covers_every_file_the_build_writes(dist):
     served = {p.relative_to(dist).as_posix() for _u, p in live_check.url_paths(dist)}
     every = {p.relative_to(dist).as_posix() for p in dist.rglob("*") if p.is_file()}
     assert {"_headers", "404.html"} <= every, every
-    assert served == every - {"_headers", "404.html"}
-    # Both exclusions are fetched by name instead, so no file in the build goes
-    # unrequested: 404.html through a missing path, _headers as a required miss.
+    assert served == every - {"_headers", "_worker.js", "404.html"}
+    # The exclusions are fetched by name instead, so no file in the build goes
+    # unrequested: 404.html through a missing path, _headers and _worker.js as
+    # required misses.
     assert live_check.MISSING_PATHS and live_check.HEADERS_PATH == "/_headers"
 
 

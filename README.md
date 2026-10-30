@@ -4,7 +4,8 @@ Owner: ATACE Working Group. Status: preview release 0.3.0.
 
 CxBOM (Context Bill of Materials) records everything assembled into an LLM
 agent's context window before inference: each component, its trust ring, and
-its provenance. It extends CycloneDX 1.6.
+its provenance. It is a profile modeled on CycloneDX 1.6, not a CycloneDX
+document: a stock CycloneDX validator does not accept a record unchanged.
 
 This repository holds the `cxbom` tool and its tests, the CxBOM specification and
 schemas in `spec/`, the interface contracts in `contracts/`, and the source of the

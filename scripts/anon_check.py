@@ -309,14 +309,15 @@ def _missing_range_endpoints(repo: Path, rev_args: list[str]) -> list[str]:
 def check_range(repo: Path, rev_range: str | list[str], tokens: list[str]) -> list[str]:
     rev_args = [rev_range] if isinstance(rev_range, str) else list(rev_range)
     fmt = "%H%x1f%an <%ae>%x1f%cn <%ce>%x1f%B%x1e"
-    try:
-        log = _git(repo, "log", f"--format={fmt}", *rev_args)
-    except subprocess.CalledProcessError:
-        # The pre-push hook builds the range from the remote sha git advertised.
-        # On a push race, or when the remote was force-updated, that sha is not
-        # yet in the local object store and `git log <remote>..<local>` aborts.
-        # This is the anonymity gate, so fail closed with a clean, actionable
-        # message rather than a traceback, and never let the push pass unscanned.
+    # The pre-push hook builds the range from the remote sha git advertised. On a
+    # push race, or when the remote was force-updated, that sha is not yet in the
+    # local object store and `git log <remote>..<local>` aborts. This is the
+    # anonymity gate, so fail closed with a clean, actionable message rather than a
+    # traceback, and never let the push pass unscanned. The exit status is read
+    # directly, so no exception handler stands between the failure and the refusal.
+    done = subprocess.run(["git", "log", f"--format={fmt}", *rev_args], cwd=repo,
+                          capture_output=True, text=True)
+    if done.returncode != 0:
         missing = _missing_range_endpoints(repo, rev_args)
         if missing:
             return [f"push range unresolved: {', '.join(missing)} not in local object store. "
@@ -324,6 +325,7 @@ def check_range(repo: Path, rev_range: str | list[str], tokens: list[str]) -> li
                     f"force-updated remote."]
         return [f"git could not resolve the push range {' '.join(rev_args)!r}. "
                 f"Refusing to certify anonymity. Fetch origin and retry."]
+    log = done.stdout
     errs: list[str] = []
     for rec in log.split("\x1e"):
         rec = rec.strip("\n")
