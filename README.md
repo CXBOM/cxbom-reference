@@ -1,6 +1,6 @@
 # CxBOM
 
-Owner: ATACE Working Group. Status: preview release 0.3.0.
+Owner: ATACE Working Group. Status: preview. Tool version 0.3.0.dev0, schema 0.3.1.
 
 CxBOM (Context Bill of Materials) records everything assembled into an LLM
 agent's context window before inference: each component, its trust ring, and
@@ -186,3 +186,25 @@ python3 -m venv .venv
 .venv/bin/pip check
 .venv/bin/python -m pytest -q
 ```
+
+The second line above fails on Python 3.15 because `brotli==1.2.0` has no wheel
+for it. Python 3.13 works.
+
+## Where to go next
+
+- [`spec/SPEC.md`](spec/SPEC.md) explains what a record holds and why.
+  [`spec/cxbom-0.3.1.schema.json`](spec/cxbom-0.3.1.schema.json) is the normative
+  definition.
+- [`spec/CHANGELOG.md`](spec/CHANGELOG.md) lists what changed in each schema
+  version.
+- [`docs/design/tool.md`](docs/design/tool.md) is the tool's design. Section 2
+  lists the features that are not built.
+- [`contracts/README.md`](contracts/README.md) defines the interface contracts.
+- [cxbom.org](https://cxbom.org) publishes the specification, the schemas, and
+  an offline record viewer.
+
+The `v0.3.0` tag stays where it is because a public preprint cites it. The tag
+keeps the tool and the CycloneDX wording as they were at that release. The fixes
+made since then, and schema 0.3.1, are on `main`.
+
+Write to spec@cxbom.org with questions.

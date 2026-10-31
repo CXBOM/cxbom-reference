@@ -28,7 +28,7 @@ each at the point where it can observe the truth:
    resource, and template listings. It also checks that the server was launched
    with the signed argv, launcher binary, pinned files, and environment. Anything
    changed or unsigned is blocked before the model reads it.
-2. **The `cxbom` emitter library** writes a complete, honest CxBOM 0.3.0 record
+2. **The `cxbom` emitter library** writes a complete, honest CxBOM 0.3.1 record
    where an application assembles its context. Each record is bound to the live
    proxy session that verified each tool.
 
@@ -100,12 +100,12 @@ Defenses for (b) rest on four things:
 
 - **CxBOM schema 0.3.1 is current.** 0.2.0 and 0.3.0 stay in the tree, byte-identical, for
   the ATACE paper and the recorded takes.
-  - The emitter writes 0.3.0 records only.
-  - Every 0.3.0 record must pass the 0.3.0 validator. 0.2.0 records still pass
-    the 0.2.0 validator, vendored byte-identical from `CXBOM/ATACE` commit
+  - The emitter writes 0.3.1 records only.
+  - Every 0.3.1 record must pass the 0.3.1 validator. 0.3.0 records still pass theirs, and
+    0.2.0 records still pass the 0.2.0 validator, vendored byte-identical from `CXBOM/ATACE` commit
     `3e7f88f` with only its two data-path constants moved to `importlib.resources`.
   - Tool-side meaning checks live in `consistency.py`.
-  - Anything 0.3.0 cannot express goes into contracts or into `schema.fieldGlossary`.
+  - Anything 0.3.1 cannot express goes into contracts or into `schema.fieldGlossary`.
 - **The trust-inversion detector is ATACE's, byte-identical.** The schema defines
   positional authority as assembly position, not a model weight. A registered trust-downgrade boundary removes the structural
   inversion (section 9.5), and the record says it changes assembly, not model weighting.
@@ -155,7 +155,7 @@ cxbom/
   renderers.py      closed renderer registry (the trust-boundary registry is not yet built)
   templates.py      per-family marker tables (strings and ids), pinned by chat_template hash
   assembly.py       Assembly: the emitter's public API (ids mode, text mode not yet built)
-  emitter.py        Assembly -> 0.3.0 record
+  emitter.py        Assembly -> 0.3.1 record
   findings.py       exact finding templates
   consistency.py    tool-side record meaning checks
   detectors.py      vendored from ATACE 3e7f88f, byte-identical
@@ -1096,7 +1096,7 @@ its text is the decoding of the ids.
   ids do not carry the token and re-tokenizing the text would. In text
   content, every added token now counts as an other special token, flagged
   special or not.
-- 0.3.0 has no component field for an id hash, and the schema is not changed for
+- 0.3.1 has no component field for an id hash, and the schema is not changed for
   it. The record carries `ids_sha256` of the ids as passed in the
   `content.sha256` glossary entry, as `<cid>=<hex>` followed by the stop id
   that ended the generation (for example `stopped on 151643 <|endoftext|>, turn
@@ -1146,7 +1146,7 @@ at their approved values.
   6. The current state from `state.py` is still `allowed` with the captured `sha256`.
 - If the named log does not exist, `emit` raises.
 
-### 9.4 Record mapping (existing 0.3.0 fields only)
+### 9.4 Record mapping (existing 0.3.1 fields only)
 
 | State at emit | Fields |
 |---|---|

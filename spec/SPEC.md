@@ -177,7 +177,7 @@ classification of the most sensitive component it describes. A component's
 `content` block stores a digest instead of the text, but other fields, such as
 `retrievalQuery`, can carry text. The digest of a short, low-entropy component,
 such as a known system prompt or tool definition, can be reversed by dictionary.
-Handle records with the same care as the content they describe. Version 0.3.0
+Handle records with the same care as the content they describe. Version 0.3.1
 has no field for a retention class or for digest salting.
 
 ## Catalog pins
