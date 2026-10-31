@@ -4,8 +4,8 @@ Owner: ATACE Working Group.
 
 The vendored validator in `cxbom/validator.py` is the ATACE 0.2.0 validator,
 kept byte-identical to its upstream except for the declared packaging patches.
-This module is the local seam that lets the current release write 0.3.0 records
-while the 0.2.0 file stays readable for the recorded takes and the ATACE copy.
+This module is the local seam that lets the current release write 0.3.1 records
+while the 0.2.0 and 0.3.0 files stay readable for the recorded takes and the ATACE copy.
 
 It does not copy a single check. It points the vendored module at the schema the
 record names, briefly, and calls the same `check_all`. The swap is process-wide,
@@ -18,8 +18,8 @@ from contextlib import contextmanager
 
 from . import validator
 
-SCHEMA_VERSION = "0.3.0"
-SCHEMA_VERSIONS = ("0.2.0", "0.3.0")
+SCHEMA_VERSION = "0.3.1"
+SCHEMA_VERSIONS = ("0.2.0", "0.3.0", "0.3.1")
 
 
 def record_version(doc) -> str:

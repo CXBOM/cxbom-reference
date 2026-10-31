@@ -17,7 +17,7 @@ cxbom.org site. The tool's design is `docs/design/tool.md`.
   tool definitions that changed after a human reviewed and signed them, and it
   refuses to launch a server whose command, launcher binary, pinned files, or
   environment differ from the signed ones.
-- The `cxbom` emitter library writes one CxBOM 0.3.0 record per inference,
+- The `cxbom` emitter library writes one CxBOM 0.3.1 record per inference,
   bound to the live proxy session that verified each tool.
 
 ## Install
@@ -169,6 +169,13 @@ tree or on the trusted search path.
 | A pinned file or tree swapped between the launch check and the exec by a process racing the proxy | Pins are checked immediately before spawn. Keep the workspace free of untrusted writers while the proxy starts |
 | Revoked-key backdating: a stolen, revoked key signs entries with an `issuedAt` before its revocation | `entrySeq` and the high-water mark bound rollback. Observe and sampling entries have no tool-set expiry, so this risk is accepted for them by owner decision 2026-10-05. A `notAfter` the owner sets still ends an entry |
 | prompts, resources, resource templates | slice 1 verifies tools only and refuses the rest |
+| Text mode in the emitter | Ids mode only. `Assembly` refuses any other mode |
+| The olmo2 template family | `phi3` and `qwen3` only |
+| The `json-indent2` and `wire` renderers | `jcs` only |
+| Trust labels on tool definitions and server instructions | Not yet built. `sanitization.trustLabel` is not written |
+| Interactive review | `--accept` with a reason is the only way to pin an item, and an item with nonprintable characters cannot be approved |
+| Ignored fields in a signed entry | `ignoreFields` is always empty |
+| `session_totals` | Not yet built. Read each record's own `sessionSummary` |
 | Hostnames under a TLD outside `approve`'s fixed list | The identifying-content check flags hostnames under a fixed TLD list only (section 7 step 1). Review argv and pinned values before approving |
 
 ## Tests

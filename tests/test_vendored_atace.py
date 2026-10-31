@@ -206,7 +206,7 @@ def test_every_entry_names_the_frozen_commit():
 
 
 def test_package_schema_is_the_published_schema():
-    for version in ("0.2.0", "0.3.0"):
+    for version in ("0.2.0", "0.3.0", "0.3.1"):
         assert (ROOT / f"cxbom/_data/cxbom-{version}.schema.json").read_bytes() == \
             (ROOT / f"spec/cxbom-{version}.schema.json").read_bytes()
 

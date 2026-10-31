@@ -511,7 +511,7 @@ def _run(opts, confirm, passphrase, out, config_dir, state_dir, environ, cwd, no
     lockfile.verified_entry(lock, opts.server_id, trusted, state, now, update_highwater=True)
     store = Store(state / "store")
     for s in snaps:
-        store.put_json(s.instructions)
+        store.put_text(s.instructions)
         for t in s.tools:
             store.put_json(t)
     out.write(f"signed entry {envelope['entrySeq']} for {opts.server_id}\n")

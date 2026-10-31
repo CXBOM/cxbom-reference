@@ -1,7 +1,7 @@
 {
-  "_comment": "Context Bill of Materials (CxBOM) v0.3.0 — Example Session Record",
-  "_ref": "ATACE Working Group, Section 6 draft. Extends CycloneDX 1.6.",
-  "specVersion": "0.3.0",
+  "_comment": "Context Bill of Materials (CxBOM) v0.3.1 — Example Session Record",
+  "_ref": "ATACE Working Group, Section 6 draft. A profile modeled on CycloneDX 1.6.",
+  "specVersion": "0.3.1",
   "extends": {
     "format": "CycloneDX",
     "version": "1.6",
@@ -14,7 +14,7 @@
     "generatedBy": {
       "name": "CxBOM Agent Audit Layer",
       "version": "0.1.0",
-      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+      "schema": "https://cxbom.org/schema/0.3.1/cxbom.schema.json"
     },
     "session": {
       "id": "sess_8f4a2b9c1e3d",
@@ -790,7 +790,7 @@
     "templateOverheadTokens": 0
   },
   "schema": {
-    "cxbomVersion": "0.3.0",
+    "cxbomVersion": "0.3.1",
     "fieldGlossary": {
       "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
       "contextualSharePercent": "This component's token count as a percentage of total context tokens used.",

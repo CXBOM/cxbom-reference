@@ -1,9 +1,9 @@
-"""Assembly facts to a CxBOM 0.3.0 record (spec 9.4 and 10).
+"""Assembly facts to a CxBOM 0.3.1 record (spec 9.4 and 10).
 
 Owner: ATACE Working Group.
 
 build_record is a pure function over facts the Assembly already resolved. It
-writes existing 0.3.0 fields only. Everything 0.3.0 cannot say (the tokenizer
+writes existing 0.3.1 fields only. Everything 0.3.1 cannot say (the tokenizer
 pin, the binding semantics, the model revision) goes into
 schema.fieldGlossary. Integrity never touches the trust-inversion
 mitigationStatus: the vendored detector decides inversion from structure
@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from . import __version__, crosswalk, findings
 from .detectors import detect_trust_inversion
 
-SCHEMA_URL = "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+SCHEMA_URL = "https://cxbom.org/schema/0.3.1/cxbom.schema.json"
 NOT_COLLECTED = ("injectionRiskRating", "sanitization.scanner", "sanitization.scannerVersion",
                  "sanitization.scannedAt", "containsPII", "containsCredentials", "containsSecretsOrKeys")
 MISSING_CONTROLS = ["injection-pattern-scan", "pii-scan", "credential-scan"]
@@ -44,7 +44,7 @@ GLOSSARY_FIXED = {
         "Model-generated re-entrant content (ring-1-derived), recorded as retrieved-document or "
         "memory-injection under the frozen enum"),
     # consistency.check requires this key on every record: mitigationStatus "full" needs a
-    # registered trust label, and the glossary is where 0.3.0 documents what that label means.
+    # registered trust label, and the glossary is where 0.3.1 documents what that label means.
     # Fixed text, spec 9.4: the label changes assembly structure, not model weighting or
     # exploitation, which the spec deliberately does not claim.
     "sanitization.trustLabel": "Registered boundary id. Changes assembly structure, not model weighting",
@@ -258,7 +258,7 @@ def build_record(inp: RecordInputs, now: str) -> dict:
     layers = inp.control_layers
     return {
         "bomFormat": "CxBOM",
-        "specVersion": "0.3.0",
+        "specVersion": "0.3.1",
         "illustrative": False,
         "extends": {"format": "CycloneDX", "version": "1.6",
                     "schema": "https://cyclonedx.org/schema/bom-1.6.schema.json"},
@@ -300,6 +300,6 @@ def build_record(inp: RecordInputs, now: str) -> dict:
             "sessionAuditClean": not open_ids,
             "auditCleanBlockers": open_ids,
         },
-        "schema": {"cxbomVersion": "0.3.0", "fieldGlossary": dict(inp.glossary)},
+        "schema": {"cxbomVersion": "0.3.1", "fieldGlossary": dict(inp.glossary)},
         "catalogVersions": catalog_versions(),
     }

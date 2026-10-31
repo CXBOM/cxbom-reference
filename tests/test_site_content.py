@@ -29,7 +29,7 @@ import anon_check  # noqa: E402
 
 SPEC = (ROOT / "spec/SPEC.md").read_text(encoding="utf-8")
 LANDING = (ROOT / "site/content/landing.md").read_text(encoding="utf-8")
-SCHEMA = json.loads((ROOT / "spec/cxbom-0.3.0.schema.json").read_text(encoding="utf-8"))
+SCHEMA = json.loads((ROOT / "spec/cxbom-0.3.1.schema.json").read_text(encoding="utf-8"))
 RECORD_BYTES = (ROOT / "site/data/session_reference.json").read_bytes()
 RECORD = json.loads(RECORD_BYTES.decode("utf-8"))
 DOCS = [("SPEC.md", SPEC), ("landing.md", LANDING)]
@@ -327,7 +327,7 @@ def test_just_in_time_allowance_does_not_hide_bare_just_as_filler():
 
 
 def test_spec_names_the_schema_url_and_the_maintainer():
-    assert "`https://cxbom.org/schema/0.3.0/cxbom.schema.json`" in SPEC
+    assert "`https://cxbom.org/schema/0.3.1/cxbom.schema.json`" in SPEC
     assert "Maintained by the ATACE Working Group." in SPEC
     assert SPEC.count("\n# ") + SPEC.startswith("# ") == 1
 

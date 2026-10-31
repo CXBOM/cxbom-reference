@@ -52,7 +52,7 @@ FONT_FILES = (
     "source-serif-4-latin-600-normal.woff2", "source-code-pro-latin-400-normal.woff2",
     "source-code-pro-latin-600-normal.woff2", "OFL.txt",
 )
-REFERENCE_SCHEMA = "cxbom-0.3.0.schema.json"
+REFERENCE_SCHEMA = "cxbom-0.3.1.schema.json"
 _SCHEMA_NAME = re.compile(r"^cxbom-(\d+\.\d+\.\d+)\.schema\.json$")
 # Suffix on every temp file _atomic_write_text creates. .gitignore matches it as
 # spec/published.lock.json.*.tmp so a killed run's leftover never gets committed.
@@ -178,7 +178,7 @@ def load_lock(root: Path) -> dict:
 def _examples_body(root: Path) -> str:
     parts = ['<h1 id="examples">Example records</h1>',
              "<p>Three hand-authored, illustrative records. Each one validates against the "
-             '<a href="/schema/0.3.0/cxbom.schema.json">0.3.0 schema</a>. Open a downloaded file in the '
+             '<a href="/schema/0.3.1/cxbom.schema.json">0.3.1 schema</a>. Open a downloaded file in the '
              '<a href="/viewer/">viewer</a> with its load button.</p>']
     for name, title in EXAMPLES:
         doc = json.loads(_read(root / "spec" / name))

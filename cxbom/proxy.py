@@ -279,6 +279,9 @@ _BLOCK_ALL = "cxbom: attestation is unavailable. Everything is blocked"
 # keeps in flight.
 MAX_IN_FLIGHT = 4096
 _TOO_MANY = "cxbom: too many requests in flight"
+_SAMPLING_DISABLED = "cxbom: sampling is disabled for this server"
+# The requests whose result may be input_required (spec 8.4).
+INPUT_REQUIRED_METHODS = frozenset({"tools/call", "prompts/get", "resources/read"})
 # The count cap alone does not bound memory: a held call keeps the full
 # request (and its edited copy) in memory until its chain settles, and a
 # held list keeps a full result. MAX_ID_RAW bounds a pending table entry's
@@ -300,14 +303,40 @@ class NullEvents:
         return None
 
 
-def error_line(id_raw: bytes, code: int, message: str) -> bytes:
+def input_required_samples(result: Node | None) -> bool:
+    """True when an input_required result asks for sampling, or cannot be read as not asking.
+
+    An entry with no readable method could be anything, so it counts as a request.
+    """
+    if result is None or result.kind != "object":
+        return False
+    kind = result.get("resultType")
+    if kind is None or kind.kind != "string" or kind.value != "input_required":
+        return False
+    requests = result.get("inputRequests")
+    if requests is None:
+        return False
+    if requests.kind != "object":
+        return True
+    for _key, _key_node, request in requests.items:
+        method = request.get("method") if request.kind == "object" else None
+        if method is None or method.kind != "string" or method.value == "sampling/createMessage":
+            return True
+    return False
+
+
+def _ascii_id(id_raw: bytes) -> bytes:
     if id_raw.startswith(b'"'):
         # A client-supplied string id can carry raw non-ASCII UTF-8. A number
         # id cannot (its grammar is ASCII-only), so only strings need this.
         # Route it through json_bytes so this proxy-authored line stays ASCII
         # like every other value the proxy writes.
-        id_raw = json_bytes(jsonstrict.to_python(jsonstrict.parse(id_raw)))
-    return (b'{"jsonrpc":"2.0","id":' + id_raw + b',"error":{"code":' + str(code).encode()
+        return json_bytes(jsonstrict.to_python(jsonstrict.parse(id_raw)))
+    return id_raw
+
+
+def error_line(id_raw: bytes, code: int, message: str) -> bytes:
+    return (b'{"jsonrpc":"2.0","id":' + _ascii_id(id_raw) + b',"error":{"code":' + str(code).encode()
             + b',"message":' + json_bytes(message) + b"}}")
 
 
@@ -918,10 +947,10 @@ class InterceptCore:
             self._block_call(msg, name, "attestation-io")
             return
         item = state.lookup(self.states, "tool", name)
-        if item.state == state.ALLOWED:
+        if item.state == state.ALLOWED and not self._relisting():
             self._remember_meta(msg, pending)
             self._forward_call(msg, pending, out, name)
-        elif item.state in (state.NOT_LISTED, state.UNVERIFIED):
+        elif item.state in (state.ALLOWED, state.NOT_LISTED, state.UNVERIFIED):
             self._remember_meta(msg, pending)
             self._unlisted_call(msg, pending, out, name, item)
         else:
@@ -929,6 +958,9 @@ class InterceptCore:
 
     def _unlisted_call(self, msg: Message, pending: Pending, out: bytes, name: str, item) -> None:
         self._block_call(msg, name, item.cause)
+
+    def _relisting(self) -> bool:
+        return False
 
     # ----- server to client ---------------------------------------------------------
 
@@ -1005,7 +1037,7 @@ class InterceptCore:
     def _server_request(self, msg: Message) -> None:
         if msg.method == "sampling/createMessage" and not self.entry["allowSampling"]:
             self._diagnostic("server requested sampling. Refused because allowSampling is false")
-            self.to_server(error_line(msg.id_raw, -32601, "cxbom: sampling is disabled for this server"))
+            self.to_server(error_line(msg.id_raw, -32601, _SAMPLING_DISABLED))
             return
         if self._in_flight() >= MAX_IN_FLIGHT:
             self.to_server(error_line(msg.id_raw, -32603, _TOO_MANY))
@@ -1060,7 +1092,26 @@ class InterceptCore:
         elif p.method == "tools/list":
             self._tools_list_result(p, msg)
         elif not p.own:
+            if self._refused_input_required(p, msg):
+                return
             self.to_client(msg.raw)
+
+    def _refused_input_required(self, p: Pending, msg: Message) -> bool:
+        """Answer an input_required result that asks for sampling the lock refuses (spec 8.4)."""
+        if self.entry["allowSampling"] or p.method not in INPUT_REQUIRED_METHODS or msg.kind != "result":
+            return False
+        if not input_required_samples(msg.node.get("result")):
+            return False
+        self._diagnostic("server requested sampling in an input_required result. "
+                         "Refused because allowSampling is false")
+        if p.method != "tools/call":
+            self.to_client(error_line(msg.id_raw, -32603, _SAMPLING_DISABLED))
+            return True
+        result = {"content": [{"type": "text", "text": _SAMPLING_DISABLED}], "isError": True}
+        if self.era != LEGACY:
+            result["resultType"] = "complete"    # required on every modern result
+        self.to_client(b'{"jsonrpc":"2.0","id":' + _ascii_id(msg.id_raw) + b',"result":' + json_bytes(result) + b'}')
+        return True
 
     # ----- initialize and discover (spec 8.3, 8.4) ----------------------------------
 
@@ -1069,7 +1120,7 @@ class InterceptCore:
         ref = None
         if text is not None:
             try:
-                ref = self.store.put_json(text)
+                ref = self.store.put_text(text)
             except (StoreError, OSError):
                 ref = None
         info = result.get("serverInfo")
@@ -1536,6 +1587,12 @@ class ProxyCore(InterceptCore):
             self._start_relist()
 
     # ----- held calls ---------------------------------------------------------------
+
+    def _relisting(self) -> bool:
+        # The server announced a change that no completed chain has read yet, so
+        # the last chain no longer vouches for an allowed tool (spec 8.5). A failed
+        # re-list waiting on its retry is the same window.
+        return self._relist_chain is not None or self._relist_retry is not None
 
     def _unlisted_call(self, msg: Message, pending: Pending, out: bytes, name: str, item) -> None:
         # Always a fresh chain, never a join onto one already in flight: a

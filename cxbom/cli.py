@@ -58,6 +58,20 @@ For code you control, run from a pinned venv made with python -m venv --copies
 so this risk is accepted for them by owner decision 2026-10-05. A notAfter the owner sets still ends an entry
   prompts, resources, resource templates
       slice 1 verifies tools only and refuses the rest
+  Text mode in the emitter
+      Ids mode only. Assembly refuses any other mode
+  The olmo2 template family
+      phi3 and qwen3 only
+  The json-indent2 and wire renderers
+      jcs only
+  Trust labels on tool definitions and server instructions
+      Not yet built. sanitization.trustLabel is not written
+  Interactive review
+      --accept with a reason is the only way to pin an item, and an item with nonprintable characters cannot be approved
+  Ignored fields in a signed entry
+      ignoreFields is always empty
+  session_totals
+      Not yet built. Read each record's own sessionSummary
   Hostnames under a TLD outside approve's fixed list
       The identifying-content check flags hostnames under a fixed TLD list only (section 7 step 1). \
 Review argv and pinned values before approving"""

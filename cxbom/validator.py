@@ -1127,6 +1127,10 @@ def main(argv=None) -> int:
     smaller upstream-identical region. The edit is declared as its own hunk,
     with its reason, in spec/published.lock.json.
     """
+    # The seam that picks the schema a record names. Imported here because it
+    # imports this module.
+    from . import conformance
+
     argv = list(sys.argv[1:] if argv is None else argv)
     submission = "--submission" in argv
     paths = [a for a in argv if not a.startswith("-")]
@@ -1142,7 +1146,7 @@ def main(argv=None) -> int:
             rc = 1  # the next file still runs
             _emit(sys.stderr, f"REFUSED {label}: {reason}")
             continue
-        errs = check_all(doc, submission_mode=submission)
+        errs = conformance.check_all(doc, submission_mode=submission)
         if errs:
             rc = 1
             _emit(sys.stdout, f"FAIL {label}")

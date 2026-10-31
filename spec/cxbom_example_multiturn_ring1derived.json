@@ -1,8 +1,8 @@
 {
-  "_comment": "CxBOM v0.3.0 — hand-authored illustrative multi-turn fixture (not emitter output). Exercises assembledAtTurn across turns and the ring-1-derived trust tier. Records pre-inference token composition only.",
-  "_ref": "ATACE Working Group, Section 6 draft. Extends CycloneDX 1.6. Third reference record: multi-turn agent session with a model-derived re-entrant component.",
+  "_comment": "CxBOM v0.3.1 — hand-authored illustrative multi-turn fixture (not emitter output). Exercises assembledAtTurn across turns and the ring-1-derived trust tier. Records pre-inference token composition only.",
+  "_ref": "ATACE Working Group, Section 6 draft. A profile modeled on CycloneDX 1.6. Third reference record: multi-turn agent session with a model-derived re-entrant component.",
   "bomFormat": "CxBOM",
-  "specVersion": "0.3.0",
+  "specVersion": "0.3.1",
   "extends": {
     "format": "CycloneDX",
     "version": "1.6",
@@ -15,7 +15,7 @@
     "generatedBy": {
       "name": "CxBOM Agent Audit Layer",
       "version": "0.1.0",
-      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+      "schema": "https://cxbom.org/schema/0.3.1/cxbom.schema.json"
     },
     "session": {
       "id": "sess_logistics_3c9a7e21b4d6",
@@ -619,7 +619,7 @@
     "templateOverheadTokens": 8
   },
   "schema": {
-    "cxbomVersion": "0.3.0",
+    "cxbomVersion": "0.3.1",
     "fieldGlossary": {
       "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
       "trustTier": "Named trust tier. ring-1-derived marks model-generated content (an assistant turn re-entering the context) that inherits Ring 1 provenance (trustRing 1).",

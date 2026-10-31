@@ -1,9 +1,9 @@
-# CxBOM specification 0.3.0
+# CxBOM specification 0.3.1
 
-Context Bill of Materials. Version 0.3.0. Maintained by the ATACE Working Group.
+Context Bill of Materials. Version 0.3.1. Maintained by the ATACE Working Group.
 
-The JSON Schema at `https://cxbom.org/schema/0.3.0/cxbom.schema.json` is the
-normative definition of a CxBOM 0.3.0 record. This document explains what the
+The JSON Schema at `https://cxbom.org/schema/0.3.1/cxbom.schema.json` is the
+normative definition of a CxBOM 0.3.1 record. This document explains what the
 schema records and why. Where the two differ, the schema wins.
 
 ## Purpose
@@ -60,7 +60,7 @@ A record is a JSON document with these required top-level fields:
 
 | Field | Purpose |
 |---|---|
-| `bomFormat`, `specVersion`, `extends` | Identify the document as CxBOM 0.3.0 and name CycloneDX 1.6 as its parent |
+| `bomFormat`, `specVersion`, `extends` | Identify the document as CxBOM 0.3.1 and name CycloneDX 1.6 as the specification it is modeled on |
 | `serialNumber`, `version` | Identify this record instance |
 | `metadata` | Generation event, the audited session, the model, and the agent |
 | `trustModel` | The trust rings this deployment declares |
@@ -199,7 +199,7 @@ A record states what it could not observe instead of guessing:
 ## Conformance
 
 A conforming record validates against the schema at
-`https://cxbom.org/schema/0.3.0/cxbom.schema.json`, and
+`https://cxbom.org/schema/0.3.1/cxbom.schema.json`, and
 `metadata.generatedBy.schema` names that URL. The schema file at that URL never
 changes. A new schema version publishes at a new path.
 

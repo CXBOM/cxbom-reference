@@ -21,7 +21,7 @@ SITE_MAP = [
     "fonts/OFL.txt", "fonts/source-code-pro-latin-400-normal.woff2", "fonts/source-code-pro-latin-600-normal.woff2",
     "fonts/source-serif-4-latin-400-italic.woff2", "fonts/source-serif-4-latin-400-normal.woff2",
     "fonts/source-serif-4-latin-600-normal.woff2", "index.html", "reference/index.html",
-    "schema/0.2.0/cxbom.schema.json", "schema/0.3.0/cxbom.schema.json", "scope/index.html",
+    "schema/0.2.0/cxbom.schema.json", "schema/0.3.0/cxbom.schema.json", "schema/0.3.1/cxbom.schema.json", "scope/index.html",
     "spec/index.html", "video/keeper-poster.jpg", "video/keeper.mp4", "video/keeper.vtt", "viewer/index.html",
 ]
 PRIVACY = ("This site sets no cookies, loads no third-party resources, and runs no analytics. "

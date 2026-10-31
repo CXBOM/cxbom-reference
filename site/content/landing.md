@@ -4,14 +4,14 @@ The film above is this recording. It is not a rate. A Context Bill of Materials 
 agent's context window before inference: each component, its trust ring, and
 its provenance. It is a profile modeled on CycloneDX 1.6, not a CycloneDX
 document. This site publishes the
-[specification](/spec/), the [JSON Schema](/schema/0.3.0/cxbom.schema.json), a
+[specification](/spec/), the [JSON Schema](/schema/0.3.1/cxbom.schema.json), a
 [field reference](/reference/), [example records](/examples/), and an offline
 [record viewer](/viewer/). The reference implementation, an MCP pinning proxy and a
 record emitter, is public with its tests at
 [https://github.com/CXBOM/cxbom-reference](https://github.com/CXBOM/cxbom-reference)
 under the Apache 2.0 license.
 
-The schema's identifier is `https://cxbom.org/schema/0.3.0/cxbom.schema.json`.
+The schema's identifier is `https://cxbom.org/schema/0.3.1/cxbom.schema.json`.
 Validators can fetch it from that address.
 
 ## Privacy

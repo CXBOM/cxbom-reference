@@ -475,3 +475,28 @@ def test_emit_leaves_printable_text_alone():
     stream = io.StringIO()
     validator._emit(stream, "OK   é ü 漢 \\ ' \" plain")
     assert stream.getvalue() == "OK   é ü 漢 \\ ' \" plain\n"
+
+
+@pytest.mark.parametrize("record", ["spec/cxbom_example_clean_baseline.json",
+                                    "spec/cxbom_example_finance_assistant.json",
+                                    "spec/cxbom_example_multiturn_ring1derived.json",
+                                    "tests/fixtures/atace/valid-minimal.json"])
+def test_the_command_line_checks_a_record_against_the_schema_it_names(record):
+    # The vendored module is pinned to 0.2.0 and conformance.py carries the seam.
+    # The command line skipped that seam, so it refused every 0.3.0 record the
+    # tool emits, while the 0.2.0 fixture stays readable.
+    done = subprocess.run([sys.executable, "-m", "cxbom.validator", str(ROOT / record)],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert (done.returncode, done.stderr) == (0, "")
+    assert done.stdout == "OK   file 1 of 1\n"
+
+
+def test_the_command_line_refuses_a_version_it_does_not_know(tmp_path):
+    doc = json.loads((ROOT / "spec/cxbom_example_clean_baseline.json").read_text(encoding="utf-8"))
+    doc["specVersion"] = "9.9.9"
+    path = tmp_path / "record.json"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    done = subprocess.run([sys.executable, "-m", "cxbom.validator", str(path)],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert done.returncode == 1
+    assert "specVersion 9.9.9 != 0.3.1" in done.stdout

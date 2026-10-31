@@ -2,6 +2,17 @@
 
 Owner: ATACE Working Group.
 
+## 0.3.1 (2026-10-31)
+
+- Correct the schema's own description of CycloneDX. CxBOM is a profile modeled
+  on CycloneDX 1.6, not a CycloneDX document. The schema descriptions and the
+  `$comment` said it extended CycloneDX, and 0.3.0 keeps that text because a
+  published schema does not change.
+- No field, type, constraint, or required list changed. A 0.3.0 record differs
+  from a 0.3.1 record only in its version fields. `specVersion`, the `$id`
+  version segment, `generatedBy.schema`, and `schema.cxbomVersion` move to 0.3.1
+  in lockstep. The validator reads 0.2.0, 0.3.0, and 0.3.1.
+
 ## Documentation correction (2026-10-30)
 
 - Correct how `SPEC.md`, `README.md`, and the site describe the relationship

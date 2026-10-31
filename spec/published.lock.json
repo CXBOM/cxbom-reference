@@ -18,6 +18,41 @@
     "local": true,
     "note": "Local 0.3.0 reference record for the site strip and viewer; not a vendored ATACE file."
   },
+  "cxbom_example_clean_baseline.json": {
+    "sha256": "dcef601f2dd77446e02ed86db6579c4d64d6bebc6c531057910c4226a4878745",
+    "authoredHere": true,
+    "renamed": [
+      {
+        "reason": "The upstream name is the one invented company in the three records that does not come from a published placeholder convention, and paired with an HR deployment it reads as a real vendor or a real engagement. The site publishes this record, so a double-blind reviewer reads it. Fabrikam is a documented fictional company, a sibling of the Contoso and Acme names the other two records already use. Declared rather than re-vendored because the durable fix is upstream renaming it; reversing this patch reproduces the upstream bytes exactly.",
+        "from": "peopleco",
+        "to": "fabrikam",
+        "occurrences": 5
+      },
+      {
+        "reason": "The upstream name is the one invented company in the three records that does not come from a published placeholder convention, and paired with an HR deployment it reads as a real vendor or a real engagement. The site publishes this record, so a double-blind reviewer reads it. Fabrikam is a documented fictional company, a sibling of the Contoso and Acme names the other two records already use. Declared rather than re-vendored because the durable fix is upstream renaming it; reversing this patch reproduces the upstream bytes exactly.",
+        "from": "PeopleCo",
+        "to": "Fabrikam",
+        "occurrences": 1
+      }
+    ],
+    "servedAt": "https://cxbom.org/examples/cxbom_example_clean_baseline.json"
+  },
+  "cxbom_example_finance_assistant.json": {
+    "sha256": "66cf8acaeb43be03dc605320eddf215df9781fffc0855526c8d18af998f68adf",
+    "authoredHere": true,
+    "servedAt": "https://cxbom.org/examples/cxbom_example_finance_assistant.json"
+  },
+  "cxbom_example_multiturn_ring1derived.json": {
+    "sha256": "47cb50bfa60cfe6ed16b8337aa11104cb272120b9cadb8db5da2b413023eea23",
+    "authoredHere": true,
+    "servedAt": "https://cxbom.org/examples/cxbom_example_multiturn_ring1derived.json"
+  },
+  "cxbom-0.3.1.schema.json": {
+    "sha256": "a610ef75d4f80663b25015efa8183adcf057c655d7413f2c902b922b86dc0aaf",
+    "servedAt": "https://cxbom.org/schema/0.3.1/cxbom.schema.json",
+    "immutable": true,
+    "lockedBy": "site/build.py --lock"
+  },
   "vendored": {
     "cxbom/_data/catalogs/SOURCES.json": {
       "sha256": "ebacc171f683f9c4b8e83474368e6e52d2b995f1683e548a28e9d0752f8fb5ae",
@@ -88,7 +123,7 @@
       "sourceCommit": "3e7f88f4ed86953a8aee17fa4c98253fbd0f2c85"
     },
     "cxbom/validator.py": {
-      "sha256": "64fc642f39c4c7e0aacf2cdb81710cd8837d49c11d3db077478b12b66751214f",
+      "sha256": "03a8d287890e1cd82949999a83effb600d9bbd8520debd0755564fd51cba25a7",
       "upstream": "CXBOM/ATACE cxbom/validator.py",
       "upstreamSha256": "ee77003213bfabdbdc5cbe8f3d4dab87b541e225d331b639a84552dc5104be0a",
       "sourceCommit": "3e7f88f4ed86953a8aee17fa4c98253fbd0f2c85",
@@ -100,9 +135,9 @@
           "occurrences": 1
         },
         {
-          "reason": "Owner ruling 2 (2026-09-27), reversing the earlier instruction to leave main() upstream-identical: main() refuses a file it cannot read, that is not a regular file, or that it cannot decode or parse, including nesting deeper than json.loads follows and an integer wider than the interpreter converts, with one stderr line and exit status 1 instead of a traceback. Every line names the file by its position on the command line, never by its path, and every character that is not printable is written as a visible escape, so one emitted line is one physical line and writing cannot raise.",
+          "reason": "Owner ruling 2 (2026-09-27), reversing the earlier instruction to leave main() upstream-identical: main() refuses a file it cannot read, that is not a regular file, or that it cannot decode or parse, including nesting deeper than json.loads follows and an integer wider than the interpreter converts, with one stderr line and exit status 1 instead of a traceback. Every line names the file by its position on the command line, never by its path, and every character that is not printable is written as a visible escape, so one emitted line is one physical line and writing cannot raise. The command line goes through cxbom/conformance.py, so it checks a record against the schema the record names (2026-10-30).",
           "from": "def main(argv=None) -> int:\n    argv = list(sys.argv[1:] if argv is None else argv)\n    submission = \"--submission\" in argv\n    paths = [a for a in argv if not a.startswith(\"-\")]\n    rc = 0\n    for p in paths:\n        doc = json.loads(pathlib.Path(p).read_text(encoding=\"utf-8\"))\n        errs = check_all(doc, submission_mode=submission)\n        if errs:\n            rc = 1\n            print(f\"FAIL {p}\")\n            for e in errs:\n                print(f\"  - {e}\")\n        else:\n            print(f\"OK   {p}\")\n    return rc\n",
-          "to": "def _escape_unprintable(ch: str) -> str:\n    o = ord(ch)\n    return f\"\\\\x{o:02x}\" if o < 0x100 else f\"\\\\u{o:04x}\" if o < 0x10000 else f\"\\\\U{o:08x}\"\n\n\ndef _emit(stream, line: str) -> None:\n    \"\"\"Write exactly one physical line of CLI output, whatever the text carries.\n\n    A finding quotes record values, and the FAIL and OK lines used to quote the\n    path the caller typed, so the record's author chooses some of these bytes.\n    A newline in them forged a line of its own (an \"OK\" under a FAIL), and an\n    escape sequence drove the terminal (erase the line above, recolour). The\n    bound is an allowlist: every character str.isprintable() rejects -- the C0\n    and C1 controls, DEL, the line and paragraph separators, format characters\n    such as the bidirectional overrides, and lone surrogates -- is written as a\n    visible \\\\xNN, \\\\uNNNN or \\\\UNNNNNNNN escape. Then backslashreplace covers a\n    printable character the stream's encoding lacks, so writing cannot raise.\n    \"\"\"\n    if not line.isprintable():\n        line = \"\".join(ch if ch.isprintable() else _escape_unprintable(ch) for ch in line)\n    enc = getattr(stream, \"encoding\", None) or \"utf-8\"\n    stream.write(line.encode(enc, \"backslashreplace\").decode(enc) + \"\\n\")\n\n\ndef _load(p: str):\n    \"\"\"(document, None) for a file that holds JSON, else (None, reason).\n\n    A reason is fixed text plus figures the reader or parser computed (a byte\n    offset, a line and a column). It is never an exception's own str(): an\n    OSError's str() carries the path, which may be absolute, and nothing a\n    refusal needs to say requires echoing the file or its contents.\n    \"\"\"\n    try:\n        # O_NONBLOCK: opening a FIFO that has no writer blocks forever, before\n        # any check could see what the path names. On a regular file it\n        # changes nothing. O_NOCTTY: a terminal device must not become ours.\n        fd = os.open(p, os.O_RDONLY | getattr(os, \"O_NONBLOCK\", 0) | getattr(os, \"O_NOCTTY\", 0))\n    except (OSError, ValueError) as exc:\n        # OSError: missing, unreadable, a socket. ValueError: a path holding a\n        # NUL byte, which no shell passes but main(argv=[...]) can.\n        return None, f\"the file cannot be read ({getattr(exc, 'strerror', None) or type(exc).__name__})\"\n    try:\n        # fstat the object that was opened, not the path, so nothing can swap\n        # the path between the check and the read. A FIFO, a device such as\n        # /dev/zero (which reads until memory runs out) and a directory are\n        # all refused here.\n        if not stat.S_ISREG(os.fstat(fd).st_mode):\n            return None, \"the file is not a regular file (a directory, FIFO, device or socket)\"\n        with os.fdopen(fd, \"rb\", closefd=False) as f:\n            data = f.read()\n    except OSError as exc:\n        return None, f\"the file cannot be read ({exc.strerror or type(exc).__name__})\"\n    finally:\n        os.close(fd)\n    try:\n        text = data.decode(\"utf-8\")\n    except UnicodeDecodeError as exc:\n        return None, f\"the file is not UTF-8 (invalid byte at offset {exc.start})\"\n    try:\n        return json.loads(text), None\n    except json.JSONDecodeError as exc:  # before ValueError: it subclasses ValueError\n        return None, f\"the file is not JSON ({exc.msg} at line {exc.lineno} column {exc.colno})\"\n    except ValueError:\n        # The one bare ValueError json.loads raises: an integer literal wider\n        # than sys.get_int_max_str_digits(), which int() refuses to convert.\n        return None, f\"the file holds an integer wider than {sys.get_int_max_str_digits()} digits\"\n    except RecursionError:\n        # json.loads recurses once per nesting level. Where it gives up depends\n        # on the interpreter: about 116,000 levels on this project's CPython 3.14.\n        return None, \"the file nests deeper than the JSON parser can follow\"\n\n\ndef main(argv=None) -> int:\n    \"\"\"Validate each file named on the command line. Exit status 1 if any file\n    fails a check or is refused, else 0.\n\n    Owner ruling 2 (2026-09-27) reversed the earlier instruction to leave this\n    function upstream-identical: a traceback on a bad file is worse than a\n    smaller upstream-identical region. The edit is declared as its own hunk,\n    with its reason, in spec/published.lock.json.\n    \"\"\"\n    argv = list(sys.argv[1:] if argv is None else argv)\n    submission = \"--submission\" in argv\n    paths = [a for a in argv if not a.startswith(\"-\")]\n    rc = 0\n    for n, p in enumerate(paths, 1):\n        # Every line names the file by position, never by path: the path is\n        # whatever the caller typed, often absolute and possibly holding a\n        # newline, and a label generated here is the only output bounded by\n        # construction (fix round 1, controller ruling on m2).\n        label = f\"file {n} of {len(paths)}\"\n        doc, reason = _load(p)\n        if reason is not None:\n            rc = 1  # the next file still runs\n            _emit(sys.stderr, f\"REFUSED {label}: {reason}\")\n            continue\n        errs = check_all(doc, submission_mode=submission)\n        if errs:\n            rc = 1\n            _emit(sys.stdout, f\"FAIL {label}\")\n            for e in errs:\n                _emit(sys.stdout, f\"  - {e}\")\n        else:\n            _emit(sys.stdout, f\"OK   {label}\")\n    return rc\n",
+          "to": "def _escape_unprintable(ch: str) -> str:\n    o = ord(ch)\n    return f\"\\\\x{o:02x}\" if o < 0x100 else f\"\\\\u{o:04x}\" if o < 0x10000 else f\"\\\\U{o:08x}\"\n\n\ndef _emit(stream, line: str) -> None:\n    \"\"\"Write exactly one physical line of CLI output, whatever the text carries.\n\n    A finding quotes record values, and the FAIL and OK lines used to quote the\n    path the caller typed, so the record's author chooses some of these bytes.\n    A newline in them forged a line of its own (an \"OK\" under a FAIL), and an\n    escape sequence drove the terminal (erase the line above, recolour). The\n    bound is an allowlist: every character str.isprintable() rejects -- the C0\n    and C1 controls, DEL, the line and paragraph separators, format characters\n    such as the bidirectional overrides, and lone surrogates -- is written as a\n    visible \\\\xNN, \\\\uNNNN or \\\\UNNNNNNNN escape. Then backslashreplace covers a\n    printable character the stream's encoding lacks, so writing cannot raise.\n    \"\"\"\n    if not line.isprintable():\n        line = \"\".join(ch if ch.isprintable() else _escape_unprintable(ch) for ch in line)\n    enc = getattr(stream, \"encoding\", None) or \"utf-8\"\n    stream.write(line.encode(enc, \"backslashreplace\").decode(enc) + \"\\n\")\n\n\ndef _load(p: str):\n    \"\"\"(document, None) for a file that holds JSON, else (None, reason).\n\n    A reason is fixed text plus figures the reader or parser computed (a byte\n    offset, a line and a column). It is never an exception's own str(): an\n    OSError's str() carries the path, which may be absolute, and nothing a\n    refusal needs to say requires echoing the file or its contents.\n    \"\"\"\n    try:\n        # O_NONBLOCK: opening a FIFO that has no writer blocks forever, before\n        # any check could see what the path names. On a regular file it\n        # changes nothing. O_NOCTTY: a terminal device must not become ours.\n        fd = os.open(p, os.O_RDONLY | getattr(os, \"O_NONBLOCK\", 0) | getattr(os, \"O_NOCTTY\", 0))\n    except (OSError, ValueError) as exc:\n        # OSError: missing, unreadable, a socket. ValueError: a path holding a\n        # NUL byte, which no shell passes but main(argv=[...]) can.\n        return None, f\"the file cannot be read ({getattr(exc, 'strerror', None) or type(exc).__name__})\"\n    try:\n        # fstat the object that was opened, not the path, so nothing can swap\n        # the path between the check and the read. A FIFO, a device such as\n        # /dev/zero (which reads until memory runs out) and a directory are\n        # all refused here.\n        if not stat.S_ISREG(os.fstat(fd).st_mode):\n            return None, \"the file is not a regular file (a directory, FIFO, device or socket)\"\n        with os.fdopen(fd, \"rb\", closefd=False) as f:\n            data = f.read()\n    except OSError as exc:\n        return None, f\"the file cannot be read ({exc.strerror or type(exc).__name__})\"\n    finally:\n        os.close(fd)\n    try:\n        text = data.decode(\"utf-8\")\n    except UnicodeDecodeError as exc:\n        return None, f\"the file is not UTF-8 (invalid byte at offset {exc.start})\"\n    try:\n        return json.loads(text), None\n    except json.JSONDecodeError as exc:  # before ValueError: it subclasses ValueError\n        return None, f\"the file is not JSON ({exc.msg} at line {exc.lineno} column {exc.colno})\"\n    except ValueError:\n        # The one bare ValueError json.loads raises: an integer literal wider\n        # than sys.get_int_max_str_digits(), which int() refuses to convert.\n        return None, f\"the file holds an integer wider than {sys.get_int_max_str_digits()} digits\"\n    except RecursionError:\n        # json.loads recurses once per nesting level. Where it gives up depends\n        # on the interpreter: about 116,000 levels on this project's CPython 3.14.\n        return None, \"the file nests deeper than the JSON parser can follow\"\n\n\ndef main(argv=None) -> int:\n    \"\"\"Validate each file named on the command line. Exit status 1 if any file\n    fails a check or is refused, else 0.\n\n    Owner ruling 2 (2026-09-27) reversed the earlier instruction to leave this\n    function upstream-identical: a traceback on a bad file is worse than a\n    smaller upstream-identical region. The edit is declared as its own hunk,\n    with its reason, in spec/published.lock.json.\n    \"\"\"\n    # The seam that picks the schema a record names. Imported here because it\n    # imports this module.\n    from . import conformance\n\n    argv = list(sys.argv[1:] if argv is None else argv)\n    submission = \"--submission\" in argv\n    paths = [a for a in argv if not a.startswith(\"-\")]\n    rc = 0\n    for n, p in enumerate(paths, 1):\n        # Every line names the file by position, never by path: the path is\n        # whatever the caller typed, often absolute and possibly holding a\n        # newline, and a label generated here is the only output bounded by\n        # construction (fix round 1, controller ruling on m2).\n        label = f\"file {n} of {len(paths)}\"\n        doc, reason = _load(p)\n        if reason is not None:\n            rc = 1  # the next file still runs\n            _emit(sys.stderr, f\"REFUSED {label}: {reason}\")\n            continue\n        errs = conformance.check_all(doc, submission_mode=submission)\n        if errs:\n            rc = 1\n            _emit(sys.stdout, f\"FAIL {label}\")\n            for e in errs:\n                _emit(sys.stdout, f\"  - {e}\")\n        else:\n            _emit(sys.stdout, f\"OK   {label}\")\n    return rc\n",
           "occurrences": 1
         }
       ]
@@ -161,34 +196,5 @@
       "upstreamSha256": "92a6e3f894075fda19f47d8755c6ce65b2a974716307d13ae5d79196011ebb44",
       "sourceCommit": "3e7f88f4ed86953a8aee17fa4c98253fbd0f2c85"
     }
-  },
-  "cxbom_example_clean_baseline.json": {
-    "sha256": "2960e75476bb68ab2a774c369f86c2cbfa8ee6e7f97f9cb15a6dd17b9b4eacbf",
-    "authoredHere": true,
-    "renamed": [
-      {
-        "reason": "The upstream name is the one invented company in the three records that does not come from a published placeholder convention, and paired with an HR deployment it reads as a real vendor or a real engagement. The site publishes this record, so a double-blind reviewer reads it. Fabrikam is a documented fictional company, a sibling of the Contoso and Acme names the other two records already use. Declared rather than re-vendored because the durable fix is upstream renaming it; reversing this patch reproduces the upstream bytes exactly.",
-        "from": "peopleco",
-        "to": "fabrikam",
-        "occurrences": 5
-      },
-      {
-        "reason": "The upstream name is the one invented company in the three records that does not come from a published placeholder convention, and paired with an HR deployment it reads as a real vendor or a real engagement. The site publishes this record, so a double-blind reviewer reads it. Fabrikam is a documented fictional company, a sibling of the Contoso and Acme names the other two records already use. Declared rather than re-vendored because the durable fix is upstream renaming it; reversing this patch reproduces the upstream bytes exactly.",
-        "from": "PeopleCo",
-        "to": "Fabrikam",
-        "occurrences": 1
-      }
-    ],
-    "servedAt": "https://cxbom.org/examples/cxbom_example_clean_baseline.json"
-  },
-  "cxbom_example_finance_assistant.json": {
-    "sha256": "8858f0978c340865678fe792a097f0273faffe8e57689f186042ff1ea6246ea3",
-    "authoredHere": true,
-    "servedAt": "https://cxbom.org/examples/cxbom_example_finance_assistant.json"
-  },
-  "cxbom_example_multiturn_ring1derived.json": {
-    "sha256": "1e5388448422823cf0fd13b9b31a2a5f74f7e8158398272044e80ef02c13def8",
-    "authoredHere": true,
-    "servedAt": "https://cxbom.org/examples/cxbom_example_multiturn_ring1derived.json"
   }
 }

@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "site"))
-from cxsite import palette  # noqa: E402
+from cxsite import gates, palette  # noqa: E402
 
 VIEWER = (ROOT / "site/viewer/cxbom_view.html").read_text(encoding="utf-8")
 CSS = (ROOT / "site/templates/site.css").read_text(encoding="utf-8")
@@ -340,9 +340,9 @@ def test_no_attention_softmax_or_crowding_claim():
 
 def test_embedded_schema_is_the_published_0_3_0_schema():
     # The validator runs against the same bytes the site serves at
-    # /schema/0.3.0/cxbom.schema.json, embedded so it needs no network.
+    # /schema/0.3.1/cxbom.schema.json, embedded so it needs no network.
     assert _const("const SCHEMA = ") == json.loads(
-        (ROOT / "spec/cxbom-0.3.0.schema.json").read_text(encoding="utf-8"))
+        (ROOT / "spec/cxbom-0.3.1.schema.json").read_text(encoding="utf-8"))
 
 
 def test_embedded_examples_are_the_shipped_examples():
@@ -370,7 +370,7 @@ def test_default_record_is_reported_valid_in_an_announced_region():
     assert v["attrs"].get("role") == "status"
     assert v["attrs"].get("aria-live") == "polite"
     assert "valid" in v["className"].split()
-    assert "Valid against CxBOM 0.3.0" in v["text"]
+    assert "Valid against CxBOM 0.3.1" in v["text"]
 
 
 def test_each_bundled_example_is_one_click_and_validates():
@@ -382,7 +382,7 @@ def test_each_bundled_example_is_one_click_and_validates():
         v = r["validation"]
         assert "valid" in v["className"].split(), (r["action"]["key"], v["className"])
         assert "invalid" not in v["className"].split(), r["action"]["key"]
-        assert "Valid against CxBOM 0.3.0" in v["text"], r["action"]["key"]
+        assert "Valid against CxBOM 0.3.1" in v["text"], r["action"]["key"]
 
 
 def test_example_buttons_are_in_the_markup_with_stable_ids():
@@ -409,7 +409,7 @@ def test_schema_invalid_record_shows_inline_errors_with_paths():
     out = _run([{"type": "loadText", "text": bad}])
     v = out["actionResults"][0]["validation"]
     assert "invalid" in v["className"].split(), v["className"]
-    assert "against CxBOM 0.3.0" in v["text"]
+    assert "against CxBOM 0.3.1" in v["text"]
     assert v["items"], "no per-error lines were listed"
     joined = "\n".join(v["items"])
     # Each error names what failed and where: a JSON-pointer path plus a reason.
@@ -424,7 +424,7 @@ def test_a_valid_record_still_renders_after_an_invalid_one():
                 {"type": "loadReference"}])
     final = out["actionResults"][-1]["validation"]
     assert "valid" in final["className"].split()
-    assert "Valid against CxBOM 0.3.0" in final["text"]
+    assert "Valid against CxBOM 0.3.1" in final["text"]
 
 
 def test_educational_layer_is_present_and_uses_native_disclosures():
@@ -463,15 +463,15 @@ def test_rendered_text_is_claims_and_attention_clean():
 def test_rendered_viewer_passes_anon_check_site():
     # The project's own anonymity gate, run over the shipped viewer bytes. This
     # is the same checker site/build.py runs over the whole dist; here it is
-    # scoped to the viewer so a failure points straight at this file.
-    script = ROOT / "scripts" / "anon_check.py"
+    # scoped to the viewer so a failure points straight at this file. A clean
+    # checkout has no .anon-tokens, so stand-in tokens keep the shape checks
+    # running there. The checker refuses an empty denylist.
+    tokens = gates.denylist_tokens(ROOT) or ["zz-secret-person", "zz-secret-org"]
     with tempfile.TemporaryDirectory() as work:
         site = Path(work) / "site"
         site.mkdir()
         shutil.copyfile(ROOT / "site/viewer/cxbom_view.html", site / "cxbom_view.html")
-        done = subprocess.run([sys.executable, str(script), "site", str(site)],
-                              cwd=ROOT, capture_output=True, text=True, timeout=120)
-    assert done.returncode == 0, f"anon_check flagged the viewer:\n{done.stderr[-4000:]}"
+        assert gates.check_anonymity(site, tokens) == []
 
 
 # ----------------------------------------------------------------------------

@@ -13,8 +13,8 @@ sys.path.insert(0, str(ROOT / "site"))
 from cxsite import reference  # noqa: E402
 from cxsite import render  # noqa: E402
 
-SCHEMA = json.loads((ROOT / "spec/cxbom-0.3.0.schema.json").read_text(encoding="utf-8"))
-HTML = reference.schema_reference_html(SCHEMA, "/schema/0.3.0/cxbom.schema.json")
+SCHEMA = json.loads((ROOT / "spec/cxbom-0.3.1.schema.json").read_text(encoding="utf-8"))
+HTML = reference.schema_reference_html(SCHEMA, "/schema/0.3.1/cxbom.schema.json")
 
 
 def test_every_top_level_field_and_definition_is_present():

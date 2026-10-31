@@ -2,7 +2,9 @@
 
 Version 4.0 (2026-09-24). Owner: ATACE Working Group.
 
-Status: **design frozen for implementation of the Oct 3 slice.** History:
+Status: **design frozen for implementation of the Oct 3 slice.** Corrected against the code on
+2026-10-31: a claim the code does not meet is marked not yet built where it appears, and section 2
+lists the features. The dated schedule in section 15 is kept as history. History:
 
 - v1.0: approved in brainstorming.
 - v2.0: applied the Round A premortem (37 findings).
@@ -76,6 +78,13 @@ Defenses for (b) rest on four things:
 | A pinned file or tree swapped between the launch check and the exec by a process racing the proxy | Pins are checked immediately before spawn. Keep the workspace free of untrusted writers while the proxy starts |
 | Revoked-key backdating: a stolen, revoked key signs entries with an `issuedAt` before its revocation | `entrySeq` and the high-water mark bound rollback. Observe and sampling entries have no tool-set expiry, so this risk is accepted for them by owner decision 2026-10-05. A `notAfter` the owner sets still ends an entry |
 | prompts, resources, resource templates | slice 1 verifies tools only and refuses the rest |
+| Text mode in the emitter | Ids mode only. `Assembly` refuses any other mode |
+| The olmo2 template family | `phi3` and `qwen3` only |
+| The `json-indent2` and `wire` renderers | `jcs` only |
+| Trust labels on tool definitions and server instructions | Not yet built. `sanitization.trustLabel` is not written |
+| Interactive review | `--accept` with a reason is the only way to pin an item, and an item with nonprintable characters cannot be approved |
+| Ignored fields in a signed entry | `ignoreFields` is always empty |
+| `session_totals` | Not yet built. Read each record's own `sessionSummary` |
 | Hostnames under a TLD outside `approve`'s fixed list | The identifying-content check flags hostnames under a fixed TLD list only (section 7 step 1). Review argv and pinned values before approving |
 
 **CVE coverage.** Every talk claim must match this table.
@@ -89,7 +98,7 @@ Defenses for (b) rest on four things:
 
 ## 3. Hard constraints
 
-- **CxBOM schema 0.3.0 is current.** 0.2.0 stays in the tree, byte-identical, for
+- **CxBOM schema 0.3.1 is current.** 0.2.0 and 0.3.0 stay in the tree, byte-identical, for
   the ATACE paper and the recorded takes.
   - The emitter writes 0.3.0 records only.
   - Every 0.3.0 record must pass the 0.3.0 validator. 0.2.0 records still pass
@@ -134,26 +143,27 @@ cxbom/
   canonical.py      RFC 8785 hashing: tools, instructions, launch, trees
   signing.py        Ed25519 envelopes, key files, trust manifest, high-water marks, revocation
   lockfile.py       cxbom.lock read, write, verify (C3)
-  store.py          content-addressed store: wire definitions, rendered texts, instructions
+  store.py          content-addressed store: wire definitions, instructions
   state.py          enforcement state function shared by proxy and emitter
   attestation.py    write-ahead attestation log (C3)
   mcpclient.py      minimal dual-era stdio client for approve and check-drift
-  display.py        escaped rendering of untrusted text for human review
+  display.py        not yet built: escaped rendering of untrusted text for human review
   relay.py          byte-level relay: framing, id correlation, single writer per stream
   proxy.py          interception, era latch, re-listing, capability stripping, splicing
   launch.py         child environment, binary and interpreter hashing, watchdog
   approve.py        review, per-era pinning, signing
-  renderers.py      closed renderer registry and trust-boundary registry
+  renderers.py      closed renderer registry (the trust-boundary registry is not yet built)
   templates.py      per-family marker tables (strings and ids), pinned by chat_template hash
-  assembly.py       Assembly: the emitter's public API (ids mode and text mode)
+  assembly.py       Assembly: the emitter's public API (ids mode, text mode not yet built)
   emitter.py        Assembly -> 0.3.0 record
   findings.py       exact finding templates
   consistency.py    tool-side record meaning checks
   detectors.py      vendored from ATACE 3e7f88f, byte-identical
-  validator.py      vendored, two declared hunks (see below)
+  validator.py      vendored, two declared hunks, the command line reaches conformance.py
   crosswalk.py      vendored, one declared hunk: data path via importlib.resources
   _data/            schema and catalogs incl. SOURCES.json, byte-identical
-  scan.py, guard.py, gate.py, cli.py
+  cli.py
+  scan.py, guard.py, gate.py  not yet built
 ```
 
 Every vendored file's SHA-256 is listed in `spec/published.lock.json` under
@@ -211,7 +221,7 @@ declaration and the reversal, not on how much of the file is left untouched.
 - **`tool_sha256`**: RFC 8785 over the whole wire tool object, minus approved
   `ignoreFields`.
   - An `ignoreFields` entry must be an exact leaf pointer under `/_meta`.
-  - `approve` shows the diff and stores a reason for each entry.
+  - `approve` always writes an empty list. Ignored fields are not yet built.
   - At every verdict, the value at an ignored pointer must be a number, a
     boolean, null, or an RFC 3339 string of 40 bytes or fewer. Anything else
     makes the verdict `changed`.
@@ -223,7 +233,8 @@ declaration and the reversal, not on how much of the file is left untouched.
   and cannot be approved.
 - **The store** lives in `<state-dir>/store/`, mode 0700, with files at 0600.
   - Wire definitions are keyed by full-object hash.
-  - Rendered texts are keyed by `content.sha256`.
+  - Instructions are stored as text, keyed by the SHA-256 of their bytes.
+  - Rendered definitions are computed at bind time and are not stored.
   - The pin hash is kept separately. It equals the wire-definition key whenever
     the era strips nothing, which is how a reader recovers an approved body
     from a pin alone. `approve` is the only writer and it always computes a
@@ -544,9 +555,9 @@ select among signed envelopes only.
 ```
 cxbom approve --server-id ID --approver ROLE [--lock PATH]
               [--era legacy|modern|both] [--client-capabilities JSON]
-              [--ignore POINTER --reason TEXT]... [--accept SHA256 --reason TEXT]...
+              [--accept SHA256 --reason TEXT]...
               [--pin-env NAME]... [--secret-env NAME]... [--pin-tree DIR]...
-              [--startup-timeout SECONDS] [--allow-nonprintable --reason TEXT]
+              [--startup-timeout SECONDS]
               [--allow-observe] [--not-after TIME]
               -- <server command...>
 ```
@@ -590,14 +601,14 @@ cxbom approve --server-id ID --approver ROLE [--lock PATH]
    - `--era both` pins each supported era.
    - The declared client capabilities (`--client-capabilities`, default `{}`) are
      hashed into the entry.
-4. **Read every page** of `instructions`, `tools/list`, `prompts/list`,
-   `resources/list`, and `resources/templates/list`. It never calls, reads, or
-   gets anything.
-5. **Review.** Each new or changed item is printed through `display.py`.
-   - C0 and C1 controls, bidi controls, zero-width characters, tag characters,
-     and non-ASCII outside a documented allowlist are shown as `\u{XXXX}`, with a count.
-   - `y` is refused when that count is above 0, unless `--allow-nonprintable`
-     gives a stored reason.
+4. **Read** `instructions` and every page of `tools/list`. It never calls, reads,
+   or gets anything. Reading `prompts/list`, `resources/list`, and
+   `resources/templates/list` is not yet built.
+5. **Review.** Interactive review is not yet built, so `approve` asks nothing.
+   It prints each new or changed item with `review_text`.
+   - Controls and all non-ASCII are shown escaped, with a count.
+   - An item left off `--accept` stays unpinned. An `--accept` on an item whose
+     count is above 0 is refused.
 6. **`--accept`** records `approvalMode: "accept-flag"`, and `approve` sets
    `allowAcceptFlag` on any entry that holds an accept-flag pin. The proxy
    honors such a pin only when the entry sets `allowAcceptFlag`.
@@ -729,7 +740,7 @@ Rules:
 | Client `prompts/*` or `resources/*` request (enforce) | `-32601` "cxbom: this version verifies tools only". The `prompts` and `resources` capabilities are removed from the `initialize` result |
 | `input_required` result on `tools/call`, `prompts/get`, or `resources/read` with `sampling/createMessage`, while `allowSampling` is false | `tools/call`: replaced by an `isError` tool result. Others: `-32603` |
 | Legacy server-initiated `sampling/createMessage`, while `allowSampling` is false | JSON-RPC error. Elicitation passes through |
-| `notifications/tools/list_changed` (legacy, or inside `subscriptions/listen`) | Forwarded. The proxy re-lists with its own ids. Only items whose hash changed leave `allowed` |
+| `notifications/tools/list_changed` (`subscriptions/listen` is not yet built) | Forwarded. The proxy re-lists with its own ids. Only items whose hash changed leave `allowed` |
 | Proxy `notifications/message` | Only on a modern request carrying `logLevel`, or in legacy after `notifications/initialized`. Otherwise the reason goes in the `-32602` text |
 
 ### 8.5 Enforcement state (`state.py`, shared with the emitter)
@@ -740,7 +751,7 @@ State is kept per `(serverId, itemType, name)`.
 |---|---|---|
 | `not-listed` | Session start | Proxy lists, then decides |
 | `allowed` | The latest completed chain showed the item's hash equal to the signed pin for the latched era. The latest `server` line has verdict `pinned-match`. The name appeared once in that chain | Forwarded |
-| `blocked` | Verdict `unpinned`, `unpinned-version`, `changed`, `uncanonicalizable`, `duplicate-name`, `not-approved`, or `accept-flag-not-allowed`, or the latest `server` line has any verdict other than `pinned-match` | Blocked |
+| `blocked` | Verdict `unpinned`, `unpinned-version`, `changed`, `uncanonicalizable`, `duplicate-name`, or `accept-flag-not-allowed`, or the latest `server` line has any verdict other than `pinned-match` | Blocked |
 | `unverified` | After a strict-parse failure, while a re-list for a changed item is in progress, or when a `pinned-match` verdict arrives before any `server` line | Blocked |
 
 - **Chains.** A chain starts at a request without a cursor. It continues only
@@ -904,7 +915,7 @@ With `--events FILE`, C2 events go to a sidecar through a bounded, droppable que
   sent equal the ids recorded.
 - `emit(..., sent_ids_sha256=)` must equal `sha256(asm.token_ids())`.
 
-**Text mode is supported for applications that must send text.**
+**Text mode is not yet built.** `Assembly` refuses any mode but `ids`. This is the design:
 
 - `calibrate=endpoint_tokenize_ids` must use the same `add_special` setting as
   the completion call.
@@ -924,7 +935,7 @@ With `--events FILE`, C2 events go to a sidecar through a bounded, droppable que
 
 `sessionSummary.templateOverheadTokens` includes BOS.
 
-**Attribution in text mode.**
+**Attribution in text mode (not yet built).**
 
 - A token whose id is a template marker is always overhead.
 - Any other token overlapping a component goes to the component with the
@@ -933,7 +944,7 @@ With `--events FILE`, C2 events go to a sidecar through a bounded, droppable que
   number of split tokens is recorded in the glossary.
 
 **Reference reproduction** (test): the ATACE reference layout, built with
-`sep("\n\n")` joiners in text mode on Phi-3, must give 46192 component tokens,
+`sep("\n\n")` joiners in ids mode on Phi-3, must give 46192 component tokens,
 13 overhead, and 46205 total.
 
 ### 9.2 API
@@ -958,6 +969,7 @@ asm = Assembly(
                                  description="MCP proxy with signed pins",
                                  owasp_coverage=["LLM04"], coverage_gaps=[])],
     lock="cxbom.lock",
+    serving="llama.cpp",
     scanner=None,
 )
 fetch_session = session_from_meta(tools_list_result)   # _meta["org.cxbom/proxySessionId"]
@@ -990,7 +1002,7 @@ record = asm.emit(session_id="sess-042", turn=1, inference_index=0,
   - The table is pinned by the `chat_template` SHA-256 from
     `tokenizer_config.json`, and a mismatch raises.
   - Families shipped: `phi3`, `qwen3` (including the `<think>\n\n</think>\n\n`
-    block when thinking is off), and `olmo2`.
+    block when thinking is off). `olmo2` is not yet built.
   - qwen3 also ships `tool_response` and `tool_response_end`. A tool result
     turn is `marker('tool_response')`, the `tool_result` component,
     `marker('tool_response_end')`, `marker('end')`, which writes exactly what
@@ -1104,8 +1116,8 @@ its text is the decoding of the ids.
 **Renderers** (`renderers.py`) form a closed registry, named by the signed entry:
 
 - `jcs`: RFC 8785.
-- `json-indent2`: sorted keys, indent 2.
-- `wire`: exact wire bytes. Ignored pointers are replaced with their approved values.
+- `json-indent2` (not yet built): sorted keys, indent 2.
+- `wire` (not yet built): exact wire bytes. Ignored pointers are replaced with their approved values.
 
 The rendered text must parse back to the attested object, with ignored pointers
 at their approved values.
@@ -1194,12 +1206,14 @@ at their approved values.
   - `version` is always 1.
   - `serialNumber` is a fresh `urn:uuid`.
   - Tool components carry `label: "mcp-tool:<serverId>/<name>"`.
-- **`session_totals(records)`** deduplicates by
+- **`session_totals(records)`** (not yet built) deduplicates by
   `(type, positionInContext, content.sha256)` and reports the worst verification state.
-- **`diff`** pairs tool components by label and other components by
+- **`diff`** (not yet built) pairs tool components by label and other components by
   `(type, positionInContext)`.
 
 ### 9.5 Trust labels
+
+This section is not yet built. It is the design.
 
 - `trust_label=` on `tool_definition` and `server_instructions` names an id from
   the boundary registry in `renderers.py`.
@@ -1225,7 +1239,7 @@ A test proves every template passes the vendored validator and resolves in the c
 | Special token, other | Special token inside non-scaffold content | medium | special-token-injection | CWE-1427 | LLM01 | open |
 | Missing control | Security fields not collected: <group> | low | missing-control | section 9.4 | section 9.4 | open |
 
-`formalRef` is `""` except for the ATACE template.
+`formalRef` is `""` for every template.
 
 ## 11. CLI
 
@@ -1300,8 +1314,8 @@ design and absent from `cxbom --help` and from the parser until it is built.
 - **Build.**
   - Backend `hatchling==1.32.4`, built with a hashed build-constraint file and
     `SOURCE_DATE_EPOCH` set to the commit time.
-  - The published wheel is built in CI on Linux. The Mac verifies it and signs it.
-  - Tool version 0.3.0.
+  - Building the published wheel in CI is not yet built. `scripts/build_wheel.py` builds it.
+  - Tool version 0.3.0.dev0 in the source tree.
   - Authors `ATACE Working Group`, no email. The only URL is `https://cxbom.org`.
   - LICENSE is Apache-2.0 for the code. NOTICE carries:
     - the ATACE credit
@@ -1382,18 +1396,18 @@ design and absent from `cxbom --help` and from the parser until it is built.
 - send invalid UTF-8, duplicate keys, lone surrogates, `1e400`, integers above
   2^53, and lines over 64 MiB
 - send batches
-- return MRTR sampling on all three methods
+- return MRTR sampling on all three methods (not yet built, the proxy tests build these messages)
 - set `ttlMs`
 - supply duplicate `org.cxbom/*` keys
 - change an ignored leaf's type
 - ignore `SIGTERM`, spawn a grandchild, and require environment variables
-- vary its tool list by declared capabilities
+- vary its tool list by declared capabilities (not yet built)
 - answer `server/discover` with a non-modern error
 
 **Security tests:**
 
 - `HOME` or `XDG_*` redirect is refused.
-- A planted `uv.toml` under a fake home is unreachable.
+- A planted `uv.toml` under a fake home is unreachable (test not yet built).
 - Trust manifest tampering.
 - `trust add` without the passphrase.
 - Rollback below the high-water mark.
@@ -1417,13 +1431,13 @@ design and absent from `cxbom --help` and from the parser until it is built.
 **Emitter tests:**
 
 - Ids-mode token equality end to end against a fake completion endpoint.
-- Text-mode id-sequence calibration, including Phi-3 rstrip absorption and the
+- Text-mode id-sequence calibration (not yet built), including Phi-3 rstrip absorption and the
   `▁` prefix after markers.
 - Reference reproduction: 46192, 13, 46205.
-- Marker tables for phi3, qwen3, and olmo2.
+- Marker tables for phi3 and qwen3.
 - Adjacent tool definitions (`}{`).
 - Unverified and observe-mode components use caller text.
-- Trust-label wrapping and escape rejection.
+- Trust-label wrapping and escape rejection (not yet built).
 - No ATACE reference constants in output.
 - Every record passes the vendored validator and `consistency.py`.
 - A record with timestamp `"yesterday"` fails.
@@ -1433,17 +1447,17 @@ attestation schemas.
 
 **CI:**
 
-- Linux on Python 3.10 and 3.13 on every push.
-- arm64 Linux and macOS arm64 on `main` and on `workflow_dispatch`.
-- Load and property suites nightly.
-- Reproducible wheel build and hash comparison.
-- `anon_check site` on the release directory.
+- Linux on Python 3.10 and 3.12 on every push.
+- Reproducible wheel hash comparison, in `tests/test_wheel.py`.
+- `anon_check site` on the built site, in the site workflow.
+- arm64 Linux and macOS arm64 runs are not yet built.
+- Nightly load and property suites are not yet built.
 
 ## 15. Delivery
 
 Today is 2026-09-24. Scope is full (owner decision). The slices are ordered by
 the demo path. Anything in the Oct 10 row that is not green by Oct 13 moves to
-"Not covered in this version" and ships documented.
+"Not covered in this version" and ships documented. That rule was applied on 2026-10-31.
 
 | Date | Deliverable |
 |---|---|
@@ -1455,4 +1469,4 @@ the demo path. Anything in the Oct 10 row that is not green by Oct 13 moves to
 | Oct 10 | Modern era, prompts, resources, and templates. Sampling, MRTR, capability stripping, `ttlMs`. Interactive review with `display.py`. `wire` and `json-indent2` renderers. The olmo2 table. Text mode. Trust labels. macOS watchdog. Special-token findings. Full relay suite. CI matrix |
 | next plan | J2 end to end. `scan`, `guard`, `gate` with bundles, `attest bundle`, `rebind-binary`, `trust revoke`, `--first-party`. Started as soon as slice 1 lands, not date gated |
 | Oct 16 | Distribution: CI-built reproducible wheel, requirements files, minisign signatures, site live with the install page |
-| Oct 19 | Final takes. **Claims gate:** every section 16 and section 17 sentence maps to a passing test id, or the pre-written reduced-claim slide is used. `check-drift` is green before each take |
+| Oct 19 | Final takes. **Claims gate:** every section 16 and section 17 sentence maps to a passing test id, or the pre-written reduced-claim slide is used. `check-drift` (not yet built) is green before each take |

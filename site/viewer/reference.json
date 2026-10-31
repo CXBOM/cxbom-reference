@@ -1,6 +1,6 @@
 {
   "bomFormat": "CxBOM",
-  "specVersion": "0.3.0",
+  "specVersion": "0.3.1",
   "illustrative": false,
   "extends": {
     "format": "CycloneDX",
@@ -14,7 +14,7 @@
     "generatedBy": {
       "name": "cxbom-emitter",
       "version": "0.1.0",
-      "schema": "https://cxbom.org/schema/0.3.0/cxbom.schema.json"
+      "schema": "https://cxbom.org/schema/0.3.1/cxbom.schema.json"
     },
     "session": {
       "id": "sess_reference_50k",
@@ -545,7 +545,7 @@
     ]
   },
   "schema": {
-    "cxbomVersion": "0.3.0",
+    "cxbomVersion": "0.3.1",
     "fieldGlossary": {
       "trustRing": "Integer 0-2. 0=operator (highest intended authority), 1=agent, 2=user (lowest intended authority). Pre-inference classification only. Does not confer different treatment inside the model.",
       "contextualSharePercent": "This component's token count as a percentage of total context tokens used."
