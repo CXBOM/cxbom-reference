@@ -1315,7 +1315,7 @@ design and absent from `cxbom --help` and from the parser until it is built.
   - Backend `hatchling==1.32.4`, built with a hashed build-constraint file and
     `SOURCE_DATE_EPOCH` set to the commit time.
   - Building the published wheel in CI is not yet built. `scripts/build_wheel.py` builds it.
-  - Tool version 0.3.0.dev0 in the source tree.
+  - Tool version 0.3.1.dev0 in the source tree.
   - Authors `ATACE Working Group`, no email. The only URL is `https://cxbom.org`.
   - LICENSE is Apache-2.0 for the code. NOTICE carries:
     - the ATACE credit
@@ -1335,7 +1335,7 @@ design and absent from `cxbom --help` and from the parser until it is built.
   ```
 
   - `cxbom-requirements.txt` holds the dependency lock plus
-    `cxbom @ https://cxbom.org/dist/cxbom-0.3.0-py3-none-any.whl --hash=sha256:...`.
+    `cxbom @ https://cxbom.org/dist/cxbom-0.3.1-py3-none-any.whl --hash=sha256:...`.
   - A minisigned `SHA256SUMS` covers every file.
   - There are separate core and emit requirement files.
   - Environments with their own lock add the same direct reference to their lock.

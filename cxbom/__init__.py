@@ -1,5 +1,5 @@
 """cxbom: MCP pinning proxy and CxBOM emitter. Owner: ATACE Working Group."""
-__version__ = "0.3.0.dev0"
+__version__ = "0.3.1.dev0"
 
 # The vendored validator and crosswalk build filesystem paths from
 # str(importlib.resources.files("cxbom")), and they stay identical to ATACE

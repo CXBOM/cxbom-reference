@@ -1,6 +1,6 @@
 # CxBOM
 
-Owner: ATACE Working Group. Status: preview. Tool version 0.3.0.dev0, schema 0.3.1.
+Owner: ATACE Working Group. Status: preview. Tool version 0.3.1.dev0, schema 0.3.1.
 
 CxBOM (Context Bill of Materials) records everything assembled into an LLM
 agent's context window before inference: each component, its trust ring, and
@@ -36,7 +36,7 @@ python3 scripts/install_cxbom.py download --wheelhouse wheelhouse \
 python3 scripts/install_cxbom.py build --wheelhouse wheelhouse --out dist \
   --pip-lock requirements/pip-build.txt
 python3 scripts/install_cxbom.py install --wheelhouse wheelhouse \
-  --wheel dist/cxbom-0.3.0.dev0-py3-none-any.whl --venv cxbom-venv --emit
+  --wheel dist/cxbom-0.3.1.dev0-py3-none-any.whl --venv cxbom-venv --emit
 ```
 
 - `download` is the only step that uses the network. It fetches every file the
@@ -205,6 +205,6 @@ for it. Python 3.13 works.
 
 The `v0.3.0` tag stays where it is because a public preprint cites it. The tag
 keeps the tool and the CycloneDX wording as they were at that release. The fixes
-made since then, and schema 0.3.1, are on `main`.
+made since then, and schema 0.3.1, are on `main` and in the `v0.3.1` tag.
 
 Write to spec@cxbom.org with questions.
